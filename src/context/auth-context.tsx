@@ -25,14 +25,15 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 /**
- * TEMPORARY mock user so the signed-in Navbar can be previewed before real
- * authentication (Better Auth) is wired up in Phase 5.
+ * TEMPORARY mock user kept around so the signed-in Navbar (avatar dropdown,
+ * Dashboard link, Logout) can still be previewed during development.
  *
- * The provider currently starts *signed in* so both Navbar states are easy to
- * test: click "Logout" to instantly see the signed-out Navbar, then refresh to
- * come back. When real auth lands, this will start signed-out instead.
+ * The provider starts *signed out* so the Navbar shows the Sign In / Sign Up
+ * buttons by default. To preview the signed-in state, pass `MOCK_USER` as the
+ * initial state below. When real auth (Better Auth, Phase 5) lands, the real
+ * session replaces this entirely.
  */
-const MOCK_USER: AuthUser = {
+export const MOCK_USER: AuthUser = {
   name: "Jane Doe",
   email: "jane.doe@pizzahub.com",
   image: "",
@@ -40,7 +41,7 @@ const MOCK_USER: AuthUser = {
 };
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(MOCK_USER);
+  const [user, setUser] = useState<AuthUser | null>(null);
 
   const logout = () => setUser(null);
 

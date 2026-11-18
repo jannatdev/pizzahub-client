@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   ChevronDown,
   LayoutDashboard,
@@ -11,10 +11,11 @@ import {
   Settings,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -28,14 +29,27 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { useAuth, type UserRole } from "@/context/auth-context";
+import {  type UserRole } from "@/context/auth-context";
 import { cn } from "@/lib/utils";
+import { signOut, useSession } from "@/lib/auth-client";
 
 /** Where each role lands after clicking "Dashboard". */
 const DASHBOARD_PATH: Record<UserRole, string> = {
-  customer: "/dashboard",
-  vendor: "/vendor",
-  admin: "/admin",
+  customer: "/customer/dashboard",
+  vendor: "/vendor/dashboard",
+  admin: "/admin/dashboard",
+};
+
+/**
+ * Better Auth's client types only expose the core user fields. `role` is
+ * declared server-side (see `user.additionalFields` in src/lib/auth.ts), so it
+ * must be declared here. It stays optional because the DB field is not required.
+ */
+type SessionUser = {
+  name: string;
+  email: string;
+  image?: string | null;
+  role?: UserRole;
 };
 
 function getInitials(name: string): string {
@@ -48,15 +62,31 @@ function getInitials(name: string): string {
 }
 
 export function Navbar() {
-  const { user, logout } = useAuth();
+  const { data: session } = useSession();
+
+  // Cast to SessionUser: `role` exists on the stored user but not on Better
+  // Auth's inferred client type. Absent role falls back to "customer".
+  const user = session?.user as SessionUser | undefined;
   const pathname = usePathname();
+  const router = useRouter();
+
+  // Better Auth sign-out — clears the session cookie on the server and the
+  // `useSession` subscription updates this Navbar immediately.
+  const handleLogout = async () => {
+    await signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/");
+          router.refresh();
+        },
+      },
+    });
+  };
 
   const links = [
     { label: "Home", href: "/" },
     { label: "Browse Menu", href: "/menu" },
-    ...(user
-      ? [{ label: "Dashboard", href: DASHBOARD_PATH[user.role] }]
-      : []),
+    
   ];
 
   const linkClass = (href: string) =>
@@ -94,48 +124,68 @@ export function Navbar() {
         <div className="hidden items-center gap-2 md:flex">
           {user ? (
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-2 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-red-500">
-                <Avatar className="size-9">
+              {/* The trigger renders a <button>, so it is styled directly
+                  instead of nesting another <Button> inside it. */}
+              <DropdownMenuTrigger
+                className={cn(
+                  buttonVariants({ variant: "ghost" }),
+                  "h-9 gap-2 px-2"
+                )}
+              >
+                <Avatar className="size-7">
                   {user.image ? (
                     <AvatarImage src={user.image} alt={user.name} />
                   ) : null}
-                  <AvatarFallback className="bg-red-100 font-semibold text-red-700">
+                  <AvatarFallback className="bg-red-100 text-xs font-semibold text-red-700">
                     {getInitials(user.name)}
                   </AvatarFallback>
                 </Avatar>
-                <span className="hidden max-w-32 truncate text-sm font-medium text-gray-800 lg:inline">
+
+                <span className="hidden max-w-28 truncate text-sm font-medium sm:inline">
                   {user.name}
                 </span>
-                <ChevronDown className="size-4 text-gray-500" />
+
+                <ChevronDown className="size-4 opacity-60" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-64">
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col">
-                    <span className="text-sm font-semibold">{user.name}</span>
-                    <span className="text-xs text-muted-foreground">
+
+              <DropdownMenuContent align="end" className="w-56">
+                {/* Base UI: GroupLabel must live inside a Group, otherwise the
+                    menu throws "MenuGroupContext is missing" when it opens. */}
+                <DropdownMenuGroup>
+                  <DropdownMenuLabel className="font-normal">
+                    <span className="block truncate text-sm font-semibold text-foreground">
+                      {user.name}
+                    </span>
+                    <span className="block truncate text-xs text-muted-foreground">
                       {user.email}
                     </span>
-                  </div>
-                </DropdownMenuLabel>
+                  </DropdownMenuLabel>
+                </DropdownMenuGroup>
+
                 <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  render={<Link href={DASHBOARD_PATH[user.role]} />}
-                >
-                  <LayoutDashboard className="size-4" />
-                  Dashboard
-                </DropdownMenuItem>
-                <DropdownMenuItem render={<Link href="/profile-settings" />}>
-                  <Settings className="size-4" />
-                  Profile Settings
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={logout}
-                  className="text-red-600 focus:text-red-600"
-                >
-                  <LogOut className="size-4" />
-                  Logout
-                </DropdownMenuItem>
+
+                <DropdownMenuGroup>
+                  <DropdownMenuItem
+                    onClick={() =>
+                      router.push(DASHBOARD_PATH[user.role ?? "customer"])
+                    }
+                  >
+                    <LayoutDashboard className="size-4" />
+                    Dashboard
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem
+                    onClick={() => router.push("/profile-settings")}
+                  >
+                    <Settings className="size-4" />
+                    Profile Settings
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="size-4" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
@@ -212,7 +262,7 @@ export function Navbar() {
                   <Button
                     variant="outline"
                     className="justify-start border-red-200 bg-white text-red-600 hover:bg-red-50"
-                    onClick={logout}
+                    onClick={handleLogout}
                   >
                     <LogOut className="size-4" />
                     Logout
