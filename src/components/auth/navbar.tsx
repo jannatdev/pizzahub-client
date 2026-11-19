@@ -32,13 +32,7 @@ import {
 import {  type UserRole } from "@/context/auth-context";
 import { cn } from "@/lib/utils";
 import { signOut, useSession } from "@/lib/auth-client";
-
-/** Where each role lands after clicking "Dashboard". */
-const DASHBOARD_PATH: Record<UserRole, string> = {
-  customer: "/customer/dashboard",
-  vendor: "/vendor/dashboard",
-  admin: "/admin/dashboard",
-};
+import { DASHBOARD_HOME } from "@/lib/dashboard-paths";
 
 /**
  * Better Auth's client types only expose the core user fields. `role` is
@@ -85,7 +79,7 @@ export function Navbar() {
 
   const links = [
     { label: "Home", href: "/" },
-    { label: "Browse Menu", href: "/menu" },
+    { label: "Browse Menu", href: "/browse-menu" },
     
   ];
 
@@ -167,7 +161,7 @@ export function Navbar() {
                 <DropdownMenuGroup>
                   <DropdownMenuItem
                     onClick={() =>
-                      router.push(DASHBOARD_PATH[user.role ?? "customer"])
+                      router.push(DASHBOARD_HOME[user.role ?? "customer"])
                     }
                   >
                     <LayoutDashboard className="size-4" />
@@ -175,7 +169,11 @@ export function Navbar() {
                   </DropdownMenuItem>
 
                   <DropdownMenuItem
-                    onClick={() => router.push("/profile-settings")}
+                    onClick={() =>
+                      router.push(
+                        `${DASHBOARD_HOME[user.role ?? "customer"]}/profile`
+                      )
+                    }
                   >
                     <Settings className="size-4" />
                     Profile Settings
@@ -190,17 +188,15 @@ export function Navbar() {
             </DropdownMenu>
           ) : (
             <>
-              <Button
+            <Button
                 variant="outline"
                 render={<Link href="/sign-in" />}
-                className="border-red-200 bg-white text-red-600 hover:bg-red-50 hover:text-red-700"
+                className="border border-red-600"
               >
                 Sign In
               </Button>
-              <Button
-                render={<Link href="/sign-up" />}
-                className="bg-red-600 text-white hover:bg-red-700"
-              >
+
+              <Button render={<Link href="/sign-up" />} className="bg-red-600 hover:bg-red-700">
                 Sign Up
               </Button>
             </>
@@ -213,7 +209,7 @@ export function Navbar() {
             <MenuIcon className="size-6" />
             <span className="sr-only">Open menu</span>
           </SheetTrigger>
-          <SheetContent side="right" className="flex w-72 flex-col gap-6">
+          <SheetContent side="right" className="flex w-72 flex-col gap-2">
             <SheetHeader>
               <SheetTitle>Menu</SheetTitle>
               <SheetDescription className="sr-only">
@@ -238,7 +234,7 @@ export function Navbar() {
               ))}
             </nav>
 
-            <div className="mt-auto flex flex-col gap-2 border-t pt-4">
+            <div className=" flex flex-col gap-2 border-t pt-4 -mt-5">
               {user ? (
                 <>
                   <div className="flex items-center gap-3 px-1">
@@ -251,12 +247,16 @@ export function Navbar() {
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col overflow-hidden">
-                      <span className="truncate text-sm font-semibold">
-                        {user.name}
-                      </span>
-                      <span className="truncate text-xs text-muted-foreground">
-                        {user.email}
-                      </span>
+                       <DropdownMenuGroup>
+                  <DropdownMenuLabel className="font-normal">
+                    <span className="block truncate text-sm font-semibold text-foreground">
+                      {user.name}
+                    </span>
+                    <span className="block truncate text-xs text-muted-foreground">
+                      {user.email}
+                    </span>
+                  </DropdownMenuLabel>
+                </DropdownMenuGroup>
                     </div>
                   </div>
                   <Button
@@ -270,19 +270,16 @@ export function Navbar() {
                 </>
               ) : (
                 <>
-                  <Button
-                    variant="outline"
-                    render={<Link href="/sign-in" />}
-                    className="border-red-200 bg-white text-red-600 hover:bg-red-50"
-                  >
-                    Sign In
-                  </Button>
-                  <Button
-                    render={<Link href="/sign-up" />}
-                    className="bg-red-600 text-white hover:bg-red-700"
-                  >
-                    Sign Up
-                  </Button>
+            <Button
+                variant="outline"
+                render={<Link href="/sign-in" />}
+              >
+                Sign In
+              </Button>
+
+              <Button render={<Link href="/sign-up" />}>
+                Sign Up
+              </Button>
                 </>
               )}
             </div>

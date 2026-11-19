@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { authClient } from "@/lib/auth-client";
+import { DASHBOARD_HOME } from "@/lib/dashboard-paths";
 
 import {
   Card,
@@ -54,25 +55,30 @@ const SignInForm = () => {
         return;
       }
 
+      const sessionResult = await authClient.getSession();
+
+      if (!sessionResult.data?.user) {
+        toast.error("Login succeeded, but session was not found.");
+        return;
+      }
+
       toast.success("Login successful!");
 
-      // Better Auth returns the user in the session data.
-
-   
-
-      const user = data?.user as typeof data.user & {
-     role?: UserRole;
+      // Better Auth returns the signed-in user in both responses. The freshly
+      // read session is the source of truth; the sign-in response is the
+      // fallback. `role` is an additional field, so it is read defensively and
+      // defaults to "customer".
+      const sessionUser = sessionResult.data.user as typeof sessionResult.data.user & {
+        role?: UserRole;
       };
+      const signInUser = data?.user as typeof data.user & {
+        role?: UserRole;
+      };
+      const role = sessionUser.role ?? signInUser.role ?? "customer";
 
-    const role = user.role;
-
-      if (role === "admin") {
-        router.push("/admin");
-      } else if (role === "vendor") {
-        router.push("/vendor");
-      } else {
-        router.push("/");
-      }
+      // Each role lands on its own dashboard overview page.
+      router.push(DASHBOARD_HOME[role]);
+      router.refresh();
     } catch (error) {
       console.error("Sign in error:", error);
 
@@ -92,7 +98,8 @@ const SignInForm = () => {
 
       await authClient.signIn.social({
         provider: "google",
-        callbackURL: "/",
+        // /dashboard forwards each role to its own dashboard home.
+        callbackURL: "/dashboard",
       });
     } catch (error) {
       console.error("Google sign in error:", error);

@@ -43,15 +43,14 @@ export function Hero() {
             minutes.
           </p>
 
-          <div className="mt-8">
-            <Button
-              size="lg"
-              render={<Link href="/menu" />}
-              className="bg-red-600 px-8 text-white shadow-lg shadow-red-600/30 hover:bg-red-700"
+         <div className="mt-8">
+            <Link
+              href="/menu"
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-red-600 px-8 text-sm font-medium text-white shadow-lg shadow-red-600/30 transition-colors hover:bg-red-700"
             >
               Explore Pizza Menu
               <ArrowRight className="size-4" />
-            </Button>
+            </Link>
           </div>
         </div>
       </div>
