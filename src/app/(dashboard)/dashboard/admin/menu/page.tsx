@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import {  useEffect, useState } from "react";
 import { toast } from "sonner";
 import { RefreshCw, Search, UtensilsCrossed } from "lucide-react";
 
@@ -29,27 +29,52 @@ export default function ManageMenuItemsPage() {
   // No setState runs before the await, so calling this from the effect is
   // safe (react-hooks/set-state-in-effect): every update lands in the async
   // continuation once the response arrives.
-  const fetchMenus = useCallback(async () => {
+  // const fetchMenus = useCallback(async () => {
+  //   try {
+  //     const data = await getAllMenuItems();
+
+  //     setMenus(Array.isArray(data) ? data : data.menus ?? []);
+  //   } catch (error) {
+  //     console.error(error);
+  //     toast.error("Failed to load menu items");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // }, []);
+
+ useEffect(() => {
+  let ignore = false;
+
+  const loadMenus = async () => {
     try {
       const data = await getAllMenuItems();
 
-      setMenus(Array.isArray(data) ? data : data.menus ?? []);
+      if (!ignore) {
+        setMenus(data.menus);
+      }
     } catch (error) {
-      console.error(error);
-      toast.error("Failed to load menu items");
+      if (!ignore) {
+        console.error("Failed to fetch menus:", error);
+        setMenus([]);
+      }
     } finally {
-      setLoading(false);
+      if (!ignore) {
+        setLoading(false);
+      }
     }
-  }, []);
+  };
 
-  useEffect(() => {
-    fetchMenus();
-  }, [fetchMenus]);
+  loadMenus();
+
+  return () => {
+    ignore = true;
+  };
+}, []);
 
   // Refresh button: show the spinner first (event handler, not an effect).
   const refresh = () => {
     setLoading(true);
-    fetchMenus();
+    
   };
 
   const handleApprove = async (id: string) => {
@@ -57,7 +82,7 @@ export default function ManageMenuItemsPage() {
       setProcessingId(id);
       await approveMenu(id);
       toast.success("Menu item approved successfully");
-      await fetchMenus();
+      
     } catch (error) {
       console.error(error);
       toast.error("Failed to approve menu item");
@@ -72,7 +97,7 @@ export default function ManageMenuItemsPage() {
       setProcessingId(id);
       await rejectMenu(id);
       toast.success("Menu item rejected successfully");
-      await fetchMenus();
+     
     } catch (error) {
       console.error(error);
       toast.error("Failed to reject menu item");
@@ -92,7 +117,7 @@ export default function ManageMenuItemsPage() {
       setProcessingId(id);
       await deleteMenu(id);
       toast.success("Menu item deleted successfully");
-      await fetchMenus();
+     
     } catch (error) {
       console.error(error);
       toast.error("Failed to delete menu item");

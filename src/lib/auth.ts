@@ -48,22 +48,16 @@ export const auth = betterAuth({
 
   user: {
     additionalFields: {
-      // IMPORTANT: the key must stay `role` — it is both the MongoDB column
-      // and the property every consumer reads (`user.role` in session.ts,
-      // navbar, sign-in redirect, databaseHooks below, and the sign-up form
-      // payload). Renaming it silently resets everyone to "customer".
+     
       role: {
         type: "string",
         required: false,
         defaultValue: "customer",
-        // The sign-up form sends the chosen role, so the field must accept
-        // client input. The validator only allows the two public roles —
-        // anything else (including "admin") is rejected with a 400, so a
-        // crafted request can never register an admin account.
         input: true,
         validator: {
           input: z.enum(["customer", "vendor"]),
         },
+         
       },
     },
   },
