@@ -8,7 +8,9 @@ import type { UserRole } from "@/context/auth-context";
  * components (auth guards, redirects).
  */
 export const DASHBOARD_HOME: Record<UserRole, string> = {
-  customer: "/dashboard/customer",
+ 
+  admin: "/dashboard/admin/overview",
   vendor: "/dashboard/vendor",
-  admin: "/dashboard/admin",
+  customer: "/dashboard/customer",
+
 };

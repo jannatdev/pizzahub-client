@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
+
 import {
   CreditCard,
   LayoutDashboard,
@@ -49,13 +50,7 @@ export interface NavSection {
   items: NavItem[];
 }
 
-/**
- * Sidebar menu per role. Each role only ever sees its own sections, so a
- * customer can never discover admin or vendor pages from the UI.
- *
- * Add a new page by adding an item here — both the desktop sidebar and the
- * mobile drawer render from this one list (no duplicated sidebar code).
- */
+
 export const navigation: Record<UserRole, NavSection[]> = {
   customer: [
     {
@@ -82,7 +77,7 @@ export const navigation: Record<UserRole, NavSection[]> = {
     {
       title: "Overview",
       items: [
-        { label: "Overview", href: DASHBOARD_HOME.vendor, icon: LayoutDashboard },
+        { label: "Overview", href:DASHBOARD_HOME.vendor, icon: LayoutDashboard },
       ],
     },
     {
@@ -111,7 +106,7 @@ export const navigation: Record<UserRole, NavSection[]> = {
     {
       title: "Overview",
       items: [
-        { label: "Overview", href: DASHBOARD_HOME.admin, icon: LayoutDashboard },
+        { label: "Overview", href: DASHBOARD_HOME.admin , icon: LayoutDashboard },
       ],
     },
     {

@@ -13,7 +13,7 @@ import {
   approveMenu,
   rejectMenu,
   deleteMenu,
-} from "@/lib/api/adminMenu";
+} from "@/lib/api/admin/adminMenu";
 
 type FilterStatus = "All" | "Pending" | "Approved" | "Rejected";
 
