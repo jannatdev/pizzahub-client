@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { DashboardLayout } from "@/components/dashboard/layout";
 import { DashboardSkeleton } from "@/components/dashboard/skeleton";
 import { getCurrentUser } from "@/lib/session";
+import { getVendorPlan } from "@/lib/vendor-plan";
 
 /**
  * Shell for every /dashboard/** route.
@@ -26,9 +27,16 @@ export default function DashboardRouteLayout({ children }: LayoutProps<"/dashboa
 async function AuthorizedShell({ children }: { children: ReactNode }) {
   const user = await getCurrentUser();
 
-  return(
+  // Vendors also resolve their plan from the backend so the shell can render
+  // the Premium badge. A failed read simply means no badge — the backend is
+  // still the only thing that enforces menu limits.
+  const plan = user.role === "vendor" ? await getVendorPlan() : null;
+
+  return (
     <div className="bg-red-50">
-      <DashboardLayout user={user}>{children}</DashboardLayout>;
+      <DashboardLayout user={{ ...user, isPremium: plan?.isPremium ?? false }}>
+        {children}
+      </DashboardLayout>
     </div>
-  ) 
+  );
 }

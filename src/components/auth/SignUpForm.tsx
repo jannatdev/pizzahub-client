@@ -84,16 +84,25 @@ export default function SignUpForm(){
           throw new Error("NEXT_PUBLIC_API_URL is not configured.");
         }
 
-        const uploadResponse = await fetch(`${apiUrl}/images/profile`, {
-          method: "POST",
-          body: formData,
-        });
+        let uploadResponse: Response;
 
-        const uploadResult = await uploadResponse.json();
-
-        if (!uploadResponse.ok) {
+        try {
+          uploadResponse = await fetch(`${apiUrl}/images/profile`, {
+            method: "POST",
+            body: formData,
+          });
+        } catch {
           throw new Error(
-            uploadResult.message || "Profile image upload failed"
+            `Could not reach the upload server at ${apiUrl}. Please make sure the backend server is running.`
+          );
+        }
+
+        const uploadResult = await uploadResponse.json().catch(() => null);
+
+        if (!uploadResponse.ok || !uploadResult?.imageUrl) {
+          throw new Error(
+            uploadResult?.message ||
+              `Profile image upload failed (HTTP ${uploadResponse.status}).`
           );
         }
 

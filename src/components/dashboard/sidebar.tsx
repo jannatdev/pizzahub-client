@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/tooltip";
 import type { AuthUser, UserRole } from "@/context/auth-context";
 import { DASHBOARD_HOME } from "@/lib/dashboard-paths";
+import { PremiumBadge } from "@/components/premium-badge";
 import { cn } from "@/lib/utils";
 
 /* -------------------------------------------------------------------------- */
@@ -239,6 +240,7 @@ function SidebarProfile({ user, showText }: { user: AuthUser; showText: boolean 
         </TooltipTrigger>
         <TooltipContent side="right">
           {user.name} · {roleLabel(user.role)}
+          {user.isPremium ? " · Premium" : ""}
         </TooltipContent>
       </Tooltip>
     );
@@ -250,9 +252,12 @@ function SidebarProfile({ user, showText }: { user: AuthUser; showText: boolean 
 
       <div className="min-w-0">
         <p className="truncate text-sm font-semibold text-gray-900">{user.name}</p>
-        <span className="mt-0.5 inline-flex w-fit rounded-full bg-red-50 px-2 py-0.5 text-[11px] font-semibold text-red-600">
-          {roleLabel(user.role)}
-        </span>
+        <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
+          <span className="inline-flex w-fit rounded-full bg-red-50 px-2 py-0.5 text-[11px] font-semibold text-red-600">
+            {roleLabel(user.role)}
+          </span>
+          {user.isPremium && <PremiumBadge />}
+        </div>
       </div>
     </div>
   );

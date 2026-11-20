@@ -27,6 +27,8 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
+import { createMenuItem, getPremiumVendor, getVendorMenuCount } from "@/lib/api/menu";
+import { useRouter } from "next/navigation";
 
 const categories = [
   "Classic Pizzas",
@@ -46,7 +48,7 @@ const AddMenuCard = () => {
 
   const formRef = useRef<HTMLFormElement>(null);
   const { data: session, isPending } = authClient.useSession();
-
+    const router= useRouter()
   // IMAGE UPLOAD
   const handleImageChange = async (file: File | undefined) => {
     if (!file) return;
@@ -94,18 +96,26 @@ const AddMenuCard = () => {
       }
 
       // FIX: Upload image through your existing backend endpoint
-      const res = await fetch(
-        `${apiUrl}/images/menu`,
-        {
+      let res: Response;
+
+      try {
+        res = await fetch(`${apiUrl}/images/menu`, {
           method: "POST",
           body: formData,
-        }
-      );
+        });
+      } catch {
+        // fetch only rejects when the request never left (backend down/wrong port)
+        throw new Error(
+          `Could not reach the upload server at ${apiUrl}. Please make sure the backend server is running.`
+        );
+      }
 
-      const data = await res.json();
+      const data = await res.json().catch(() => null);
 
-      if (!res.ok || !data.success || !data.imageUrl) {
-        throw new Error(data.message || "Image upload failed.");
+      if (!res.ok || !data?.success || !data.imageUrl) {
+        throw new Error(
+          data?.message || `Image upload failed (HTTP ${res.status}).`
+        );
       }
 
       setImageUrl(data.imageUrl);
@@ -152,97 +162,101 @@ const AddMenuCard = () => {
   };
 
   // CREATE MENU
-  const handleSubmit = async (
-    e: React.FormEvent<HTMLFormElement>
-  ) => {
-    e.preventDefault();
+  
+const handleSubmit = async (
+  e: React.FormEvent<HTMLFormElement>
+) => {
+  e.preventDefault();
 
-    if (isPending) {
-      toast.error("Please wait while your session is loading.");
+  if (!session?.user?.email) {
+    toast.error("Please sign in again to add menu items.");
+    return;
+  }
+
+  if (isUploading || isSubmitting) {
+    toast.error("Please wait for the current operation to finish.");
+    return;
+  }
+
+  const form = e.currentTarget;
+  const formData = new FormData(form);
+
+  const itemName = String(formData.get("itemName") ?? "").trim();
+  const description = String(formData.get("description") ?? "").trim();
+  const price = String(formData.get("price") ?? "").trim();
+  const location = String(formData.get("location") ?? "").trim();
+
+  if (!itemName || !category || !description || !price || !location) {
+    toast.error("Please fill in all required fields.");
+    return;
+  }
+
+  if (!Number.isFinite(Number(price)) || Number(price) <= 0) {
+    toast.error("Please enter a valid price.");
+    return;
+  }
+
+  if (!imageUrl) {
+    toast.error("Please upload an item image first.");
+    return;
+  }
+
+  const email = session.user.email;
+
+  setIsSubmitting(true);
+
+  try {
+    // Check vendor menu count
+    const countData = await getVendorMenuCount();
+
+    const premiumData = await getPremiumVendor();
+
+    // getPremiumVendor() returns null when the status call fails — optional
+    // chaining keeps a failed status check from crashing the whole form.
+    // countData.isPaid is already authoritative, so a premium vendor passes.
+    if (
+      !premiumData?.isPremium &&
+      (countData?.count ?? 0) >= (countData?.freeLimit ?? 3) &&
+      !countData?.isPaid
+    ) {
+      toast.error("Free plan limit reached — upgrade to add more items.");
+      router.push("/payment");
       return;
     }
+    const menuData = {
+      itemName,
+      category,
+      description,
+      price: Number(price),
+      location,
+      imageUrl,
+    };
 
-    if (!session?.user?.email) {
-      toast.error("Please sign in again to add menu items.");
-      return;
-    }
+    // Backend independently enforces the limit
+    const result = await createMenuItem(email, menuData);
 
-    if (isUploading) {
-      toast.error("Please wait for the image upload to finish.");
-      return;
-    }
-
-    const form = e.currentTarget;
-    const formData = new FormData(form);
-
-    const itemName = String(formData.get("itemName") ?? "").trim();
-    const description = String(formData.get("description") ?? "").trim();
-    const price = String(formData.get("price") ?? "").trim();
-    const location = String(formData.get("location") ?? "").trim();
-
-    if (!itemName || !category || !description || !price || !location) {
-      toast.error("Please fill in all required fields.");
-      return;
-    }
-
-    if (!Number.isFinite(Number(price)) || Number(price) <= 0) {
-      toast.error("Please enter a valid price.");
-      return;
-    }
-
-    if (!imageUrl) {
-      toast.error("Please upload an item image first.");
-      return;
-    }
-
-    const email = session.user.email;
-
-    setIsSubmitting(true);
-
-    try {
-      // One POST request creates the menu item. `credentials: "include"` is
-      // required: the API lives on another origin (NEXT_PUBLIC_API_URL), and
-      // without it the browser omits the Better Auth session cookie, so the
-      // server would answer 401 "You must be logged in."
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/menu/${encodeURIComponent(email)}`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            itemName,
-            category,
-            description,
-            price: Number(price),
-            location,
-            imageUrl,
-          }),
-        }
-      );
-
-      const data = await res.json();
-
-      if (!res.ok || !data.success) {
-        throw new Error(data.message || "Failed to create menu item.");
-      }
-
+    if (result.success) {
       toast.success("Menu item created — pending admin approval.");
-
       resetForm();
-    } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Failed to create menu item."
-      );
-    } finally {
-      setIsSubmitting(false);
     }
-  };
+  } catch (error) {
+    const err = error as Error & {
+      code?: string;
+      status?: number;
+    };
 
+    if (err.code === "MENU_LIMIT_REACHED") {
+      toast.error("You have reached your free menu limit.");
+      router.push("/payment");
+      return;
+    }
+
+    toast.error(err.message || "Failed to create menu item.");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+   
   // SESSION LOADING SPINNER
   if (isPending) {
     return (
@@ -362,7 +376,7 @@ const AddMenuCard = () => {
                   src={imagePreview}
                   alt="Menu preview"
                   fill
-                  className="h-56 w-full object-cover"
+                  className="h-80 w-full object-cover"
                 />
 
                 <button

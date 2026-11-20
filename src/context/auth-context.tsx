@@ -14,6 +14,13 @@ export interface AuthUser {
   /** Profile image URL. An empty string renders an initials avatar instead. */
   image: string;
   role: UserRole;
+  /**
+   * Vendor plan flag. Resolved server-side in the dashboard shell from the
+   * backend (src/lib/vendor-plan.ts) — undefined for customers/admins and
+   * whenever the plan could not be read. Display-only: the backend is still
+   * the only thing that enforces menu limits.
+   */
+  isPremium?: boolean;
 }
 
 interface AuthContextValue {

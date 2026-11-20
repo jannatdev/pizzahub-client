@@ -6,6 +6,7 @@ import { Bell, ChevronRight, Home, Menu as MenuIcon, PanelLeft } from "lucide-re
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { PremiumBadge } from "@/components/premium-badge";
 import type { AuthUser } from "@/context/auth-context";
 import { DASHBOARD_HOME } from "@/lib/dashboard-paths";
 import { getPageInfo } from "@/components/dashboard/sidebar";
@@ -107,9 +108,12 @@ export function DashboardHeader({
           </ol>
         </nav>
 
-        <h1 className="truncate text-base font-semibold text-gray-900 sm:text-lg">
-          {title}
-        </h1>
+        <div className="flex min-w-0 items-center gap-2">
+          <h1 className="truncate text-base font-semibold text-gray-900 sm:text-lg">
+            {title}
+          </h1>
+          {user.isPremium && <PremiumBadge />}
+        </div>
       </div>
 
       {/* Right side actions */}
