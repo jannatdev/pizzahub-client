@@ -74,29 +74,29 @@ export const AdminUsersTable = () => {
 
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [category, setCategory] = useState<string>("all");
+  const limit=10;
+  // const [limit, setLimit] = useState(10);
 
-  const [limit, setLimit] = useState(10);
+// const fetchUsers = async () => {
+//   try {
+//     setLoading(true);
 
-const fetchUsers = async () => {
-  try {
-    setLoading(true);
+//     const data = await getAllUsers({
+//       page,
+//       limit,
+//       search: search.trim(),
+//       role,
+//     });
 
-    const data = await getAllUsers({
-      page,
-      limit,
-      search: search.trim(),
-      role,
-    });
-
-    setUsers(data.users);
-    setPagination(data.pagination);
-  } catch (error) {
-    console.error("Fetch users error:", error);
-    setUsers([]);
-  } finally {
-    setLoading(false);
-  }
-};
+//     setUsers(data.users);
+//     setPagination(data.pagination);
+//   } catch (error) {
+//     console.error("Fetch users error:", error);
+//     setUsers([]);
+//   } finally {
+//     setLoading(false);
+//   }
+// };
 
 useEffect(() => {
   let ignore = false;

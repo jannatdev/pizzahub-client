@@ -21,12 +21,30 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 import type { Menu } from "@/type/menu";
 import type { UserRole } from "@/context/auth-context";
 import { getMenuDetails } from "@/lib/api/menu";
-import { placeOrder } from "@/lib/api/order";
+import { createOrder } from "@/lib/api/order";
 import { useSession } from "@/lib/auth-client";
+
+/** Min delivery date for the order form (local calendar day). */
+const TODAY = (() => {
+  const date = new Date();
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+})();
 
 /**
  * Better Auth's client types only expose the core user fields. `role` is
@@ -61,6 +79,13 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
 
   // Order button state (prevents double-clicks / duplicate requests)
   const [ordering, setOrdering] = useState(false);
+
+  // Delivery form (backend requires delivery date + address)
+  const [orderDialogOpen, setOrderDialogOpen] = useState(false);
+  const [deliveryDate, setDeliveryDate] = useState("");
+  const [deliveryAddress, setDeliveryAddress] = useState("");
+  const [additionalMessage, setAdditionalMessage] = useState("");
+  const [formError, setFormError] = useState("");
 
   // Image gallery index
   const [activeIndex, setActiveIndex] = useState(0);
@@ -156,17 +181,41 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
           : "Ordering unavailable for this item.";
 
   // ---------------------------------------------------------------
-  // Place order (backend re-validates everything)
+  // Place order — step 1 opens the delivery form, step 2 submits
+  // (backend re-validates everything)
   // ---------------------------------------------------------------
+  const openOrderForm = () => {
+    setFormError("");
+    setOrderDialogOpen(true);
+  };
+
   const handleOrder = async () => {
     // Ignore repeated clicks while a request is in flight
     if (ordering || !menuItem) return;
 
+    if (!deliveryDate) {
+      setFormError("Please choose a delivery date.");
+      return;
+    }
+
+    if (!deliveryAddress.trim()) {
+      setFormError("Please enter a delivery address.");
+      return;
+    }
+
+    setFormError("");
     setOrdering(true);
 
     try {
-      await placeOrder({ menuId: menuItem._id, quantity: 1 });
+      await createOrder({
+        menuId: menuItem._id,
+        quantity: 1,
+        deliveryDate,
+        deliveryAddress: deliveryAddress.trim(),
+        additionalMessage: additionalMessage.trim() || undefined,
+      });
 
+      setOrderDialogOpen(false);
       toast.success("Order placed successfully!", {
         description: "The vendor will review your order shortly.",
       });
@@ -496,7 +545,7 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
                 size="lg"
                 className="w-full bg-red-600 text-white hover:bg-red-700"
                 disabled={ordering}
-                onClick={handleOrder}
+                onClick={openOrderForm}
               >
                 {ordering ? (
                   <>
@@ -529,6 +578,107 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
           </div>
         </div>
       </div>
+
+      {/* ----------------------------------------------------------- */}
+      {/* Order form — delivery details (required by the backend)      */}
+      {/* ----------------------------------------------------------- */}
+      <Dialog open={orderDialogOpen} onOpenChange={setOrderDialogOpen}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Complete Your Order</DialogTitle>
+            <DialogDescription>
+              Tell the vendor when and where to deliver your pizza.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            {/* Item + price summary */}
+            <div className="flex items-center justify-between gap-3 rounded-lg border bg-muted/30 px-3 py-2 text-sm">
+              <span className="truncate font-medium">
+                {menuItem?.itemName}
+              </span>
+              <span className="shrink-0 font-bold text-red-600">
+                ৳{menuItem?.price}
+              </span>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="order-delivery-date">
+                Delivery Date *
+              </Label>
+              <Input
+                id="order-delivery-date"
+                type="date"
+                min={TODAY}
+                value={deliveryDate}
+                onChange={(event) => setDeliveryDate(event.target.value)}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="order-delivery-address">
+                Delivery Address *
+              </Label>
+              <Textarea
+                id="order-delivery-address"
+                rows={2}
+                placeholder="House, street, area, city..."
+                value={deliveryAddress}
+                onChange={(event) =>
+                  setDeliveryAddress(event.target.value)
+                }
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="order-message">
+                Additional Message
+              </Label>
+              <Textarea
+                id="order-message"
+                rows={2}
+                placeholder="Extra instructions for the vendor (optional)..."
+                value={additionalMessage}
+                onChange={(event) =>
+                  setAdditionalMessage(event.target.value)
+                }
+              />
+            </div>
+
+            {formError ? (
+              <p className="text-sm text-red-600">{formError}</p>
+            ) : null}
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setOrderDialogOpen(false)}
+              disabled={ordering}
+            >
+              Cancel
+            </Button>
+
+            <Button
+              className="bg-red-600 text-white hover:bg-red-700"
+              onClick={handleOrder}
+              disabled={ordering}
+            >
+              {ordering ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Placing Order...
+                </>
+              ) : (
+                <>
+                  <ShoppingCart className="mr-2 h-4 w-4" />
+                  Place Order
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
