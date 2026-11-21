@@ -44,11 +44,11 @@ pizzahub-client/
 ├── eslint.config.mjs          # eslint-config-next (core-web-vitals + typescript), ESLint CLI
 ├── .env                       # git-ignored secrets (MONGODB_URI, Google OAuth, BETTER_AUTH_URL, ...)
 ├── src/
-│   ├── proxy.ts               # Next 16 "middleware": optimistic session-cookie check for /dashboard*
+│   ├── proxy.ts               # Next 16 "middleware": session-cookie check for /dashboard* + /browse-menu/[id] → /menu/[id] redirect
 │   ├── app/
 │   │   ├── layout.tsx         # Root layout (typed with LayoutProps<"/">), Geist fonts, Toaster
 │   │   ├── globals.css        # Tailwind 4 CSS-first config + shadcn theme variables
-│   │   ├── (root)/            # Public site: Navbar + homepage
+│   │   ├── (root)/            # Public site: Navbar, homepage, browse-menu list, menu/[id] details
 │   │   ├── (auth)/            # sign-in / sign-up pages
 │   │   ├── api/auth/[...all]/ # Better Auth route handler
 │   │   └── (dashboard)/dashboard/   # Role-based dashboard (tree below)
@@ -64,6 +64,7 @@ pizzahub-client/
 │       ├── auth-client.ts     # Better Auth react client (useSession, signIn, signOut)
 │       ├── session.ts         # Server DAL: getCurrentUser() / requireRole() — role guards
 │       ├── dashboard-paths.ts # DASHBOARD_HOME per role (safe to import client + server)
+│       ├── api/               # fetch helpers: menu.ts, browseMenu.ts, order.ts, admin/, payment.ts
 │       ├── utils.ts           # re-exports { cn } from the "cn" package
 │       └── highlighter.tsx
 ├── public/                    # static assets
@@ -84,7 +85,7 @@ src/app/(dashboard)/dashboard/
 
 Protection layers (in order): `src/proxy.ts` (cookie presence, no DB) → `dashboard/layout.tsx` (valid session, or → `/sign-in`) → `customer|vendor|admin/layout.tsx` (`requireRole`, wrong role → that user's `DASHBOARD_HOME`). New dashboard routes must live under a role segment so the existing guard covers them. Feature pages are `PagePlaceholder` stubs until their phases build them.
 
-**Not yet present** (expected by later phases — create them when the phase calls for it): server-side menu/order/transaction APIs (they belong in pizzahub-server), real dashboard feature pages (menu CRUD, orders, transactions, Stripe).
+**Not yet present** (expected by later phases — create them when the phase calls for it): menu update/delete APIs, the Phase-16 order fields (delivery date/address), and admin transaction records in pizzahub-server — basic menu browse/details/create, order create/list, admin, and payment-verify routes already exist there; real dashboard feature pages (menu CRUD, orders, transactions, Stripe) are still `PagePlaceholder` stubs.
 
 ## 4. This Repo (pizzahub-server) — Sibling Structure
 
@@ -103,12 +104,21 @@ pizzahub-server/
 │   └── auth.ts               # Better Auth server config (MongoDB adapter, `role` additionalField)
 ├── route/                    # Path wiring only → mounted 1:1 in index.js
 │   ├── image.route.ts        #   POST /images/profile   (used by the client SignUpForm)
-│   └── menu.route.ts         #   POST /api/menu/:email  (attachSession runs first)
+│   ├── menu.route.ts         #   POST /api/menu/:email  (attachSession runs first)
+│   ├── browseMenu.route.ts   #   GET /api/browse-menu/all (public: approved+active, facets, search/sort)
+│   ├── singleMenu.route.ts   #   GET /api/menu/:id      (public details + vendorImage join)
+│   ├── order.route.ts        #   POST|GET /api/orders   (requireAuth; create is customer-only)
+│   ├── admin/                #   admin users/overview + admin menu actions on /api/menu
+│   └── payment.route.ts      #   POST /api/payment/checkout_verify (Stripe verify → payments record)
 ├── controllers/
 │   ├── image.controller.ts   # profile image → ImgBB
-│   └── menu.controller.ts    # menu create: session guard, role, ownership, validation, free-plan 3-item limit
+│   ├── menu.controller.ts    # menu create: session guard, role, ownership, validation, free-plan 3-item limit
+│   ├── browseMenu.controller.ts # public browse: Approved+isActive, search/sort/facets, vendor image join
+│   ├── singleMenu.controller.ts # details: 400 invalid id, 404 missing, vendor image join
+│   ├── order.controller.ts   # createOrder: 401/403 gates, approved+active checks, price read from DB
+│   └── admin/                # admin controllers (users, menu, overview)
 ├── middleware/
-│   ├── auth.middleware.ts    # attachSession: Better Auth cookie → req.user (fails closed → 401/403)
+│   ├── auth.middleware.ts    # attachSession → req.user; requireAuth → 401 without a session
 │   └── upload.middleware.ts  # multer memory upload (JPG/PNG/WEBP, 2 MB)
 └── services/
     └── imgbb.service.ts      # ImgBB upload helper
@@ -134,8 +144,8 @@ Status markers: ⬜ not started, 🟡 in progress, ✅ done. Update this table a
 | 8 | Frontend **role-based dashboard protection** (Admin/Vendor/Customer); URL-tampering blocked; must work with production route refreshes (server-side checks, not client-only) | ✅ |
 | 9 | **Homepage**: Hero, Featured Menu Items, Pizza Categories, Why Choose PizzaHub, How PizzaHub Works; themed, responsive, simple motion animations | ⬜ |
 | 10 | **Menu CRUD APIs**: create/get/get-by-id/update/delete; auth + vendor ownership checks; only **approved + active** items public | ⬜ |
-| 11 | **Browse Menu page**: approved/active items; search by name, category tabs/filter, location filter, price asc/desc sort, loading + empty states; wired to backend API | ⬜ |
-| 12 | **Menu details page** `/menu/[id]`: images, name, category, description, price, location, vendor info, Order button. Ordering rules: only logged-in Customers; vendors can't order own items; Admins can't place customer orders; invalid IDs handled | ⬜ |
+| 11 | **Browse Menu page**: approved/active items; search by name, category tabs/filter, location filter, price asc/desc sort, loading + empty states; wired to backend API | ✅ |
+| 12 | **Menu details page** `/menu/[id]`: images, name, category, description, price, location, vendor info, Order button. Ordering rules: only logged-in Customers; vendors can't order own items; Admins can't place customer orders; invalid IDs handled | ✅ |
 | 13 | **Vendor Dashboard**: responsive sidebar (Overview, My Menu Items, Add Menu Item, Customer Orders, Subscription, Profile Settings) + overview stats. **Menu management**: CRUD, availability toggle; Free plan max **3 active** items, Premium unlimited (backend-enforced); **ImgBB** image upload; loading/error handling; keep existing menu functionality | ⬜ |
 | 14 | **Admin Dashboard**: sidebar (Overview, Manage Users, Manage Menu Items, Transactions) + platform stats. **Manage Users**: view/search/filter by role/block/unblock. **Manage Menu Items**: view/search/filter/approve/reject/delete. Admin-only APIs; not all actions implemented yet | ⬜ |
 | 15 | **Customer Dashboard**: Overview (total/pending/accepted/rejected orders), My Orders, Profile Settings. Customers view own orders + details, cancel **Pending only**; ownership verified on backend | ⬜ |

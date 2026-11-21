@@ -15,6 +15,20 @@ import { getSessionCookie } from "better-auth/cookies";
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Legacy menu details URL → canonical route (Phase 12 lives at /menu/[id]).
+  // A real HTTP redirect here is instant; the /browse-menu/[id] page remains
+  // as a fallback for anything this matcher does not catch.
+  const legacyMenuDetailsMatch = pathname.match(
+    /^\/browse-menu\/([^/]+)$/
+  );
+
+  if (legacyMenuDetailsMatch) {
+    return NextResponse.redirect(
+      new URL(`/menu/${legacyMenuDetailsMatch[1]}`, request.url),
+      307
+    );
+  }
+
   const isDashboardRoute =
     pathname === "/dashboard" || pathname.startsWith("/dashboard/");
 
@@ -26,5 +40,9 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard", "/dashboard/:path*"],
+  matcher: [
+    "/dashboard",
+    "/dashboard/:path*",
+    "/browse-menu/:path*",
+  ],
 };

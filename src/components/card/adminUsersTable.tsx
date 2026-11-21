@@ -33,8 +33,6 @@ import {
 
 import { Skeleton } from "@/components/ui/skeleton";
 
-import { getAllPublicMenus } from "@/lib/api/browseMenu";
-import { Menu } from "@/type/menu";
 import { getAllUsers } from "@/lib/api/admin/adminUser";
 
 interface User {

@@ -1,5 +1,7 @@
 
 
+import type { Menu } from "@/type/menu";
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 // Shared request helper: builds the URL, explains network failures
@@ -91,4 +93,19 @@ export const getPremiumVendor = async () => {
     console.error("Premium status error:", error);
     return null;
   }
+};
+
+// Public menu item details (GET /api/menu/:id)
+export const getMenuDetails = async (
+  id: string
+): Promise<Menu> => {
+  const data = await request(
+    `/api/menu/${encodeURIComponent(id)}`,
+    {
+      method: "GET",
+      cache: "no-store",
+    }
+  );
+
+  return data.data as Menu;
 };
