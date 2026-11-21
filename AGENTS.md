@@ -79,7 +79,7 @@ src/app/(dashboard)/dashboard/
 ├── page.tsx                   # /dashboard → redirects to the role's overview
 ├── loading.tsx                # ContentSkeleton while a dashboard page loads
 ├── customer/                  # layout.tsx → requireRole("customer"); page, orders/, profile/
-├── vendor/                    # layout.tsx → requireRole("vendor"); page, menu/, menu/AddMenu/, orders/, subscription/, profile/
+├── vendor/                    # layout.tsx → requireRole("vendor"); page, menu/, menu/AddMenu/, menu/EditMenu/[id]/, orders/, subscription/, profile/
 └── admin/                     # layout.tsx → requireRole("admin"); page, users/, menu/, transactions/, profile/
 ```
 

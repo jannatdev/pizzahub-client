@@ -28,16 +28,8 @@ import {
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import { createMenuItem, getPremiumVendor, getVendorMenuCount } from "@/lib/api/menu";
+import { MENU_CATEGORIES as categories } from "@/lib/menu-categories";
 import { useRouter } from "next/navigation";
-
-const categories = [
-  "Classic Pizzas",
-  "Vegetarian Pizzas",
-  "Meat Lovers",
-  "Specialty / Gourmet Pizzas",
-  "Sides & Appetizers",
-  "Beverages & Desserts",
-];
 
 const AddMenuCard = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);

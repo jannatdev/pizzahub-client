@@ -6,7 +6,7 @@ import { RefreshCw, Search, UtensilsCrossed } from "lucide-react";
 
 import ManageMenuCard, {
   type MenuItem,
-} from "@/components/card/manageMenuCard";
+} from "@/components/card/admin/manageMenuCard";
 
 import {
   getAllMenuItems,

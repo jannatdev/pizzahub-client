@@ -34,3 +34,31 @@ export interface BrowseMenusResponse {
   /** Distinct locations across ALL approved + active items. */
   locations: string[];
 }
+
+export type MenuStatus = "Pending" | "Approved" | "Rejected";
+
+export interface MenuItem {
+  _id: string;
+  itemName: string;
+  category: string;
+  description: string;
+  price: number;
+  location: string;
+  imageUrl: string;
+  vendorId: string;
+  vendorName: string;
+  vendorEmail: string;
+  status: MenuStatus;
+  isActive?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UpdateMenuData {
+  itemName?: string;
+  category?: string;
+  description?: string;
+  price?: number;
+  location?: string;
+  imageUrl?: string;
+}

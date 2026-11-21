@@ -1,4 +1,4 @@
-import AdminOverviewTable from "@/components/card/AdminOverviewTable";
+import AdminOverviewTable from "@/components/card/admin/AdminOverviewTable";
 import { getAdminOverview } from "@/lib/api/admin/adminOverview";
 import { Suspense } from "react";
 

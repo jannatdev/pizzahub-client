@@ -1,7 +1,7 @@
 import { Users } from "lucide-react";
 
 import { PagePlaceholder } from "@/components/dashboard/placeholder";
-import AdminUsersTable from "@/components/card/adminUsersTable";
+import AdminUsersTable from "@/components/card/admin/adminUsersTable";
 
 export default function ManageUsersPage() {
   return (

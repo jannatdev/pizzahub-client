@@ -1,4 +1,4 @@
-import AddMenuCard from '@/components/card/AddMenuCard';
+import AddMenuCard from '@/components/card/vendor/AddMenuCard';
 import React from 'react';
 
 const AddMenu = () => {

@@ -83,7 +83,7 @@ export const navigation: Record<UserRole, NavSection[]> = {
     {
       title: "Menu Management",
       items: [
-        { label: "My Menu Items", href: "/dashboard/vendor/menu", icon: Utensils },
+        { label: "My Menu Items", href: "/dashboard/vendor/menu/ManageMenu", icon: Utensils },
         { label: "Add Menu Item", href: "/dashboard/vendor/menu/AddMenu", icon: PlusCircle },
       ],
     },
