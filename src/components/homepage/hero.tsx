@@ -13,7 +13,7 @@ export function Hero() {
         fill
         preload
         sizes="100vw"
-        className="object-cover"
+        className="h-80"
       />
 
       {/* Dark overlay so the text stays readable over the image */}
