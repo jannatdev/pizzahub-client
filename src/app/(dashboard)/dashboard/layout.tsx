@@ -40,3 +40,4 @@ async function AuthorizedShell({ children }: { children: ReactNode }) {
     </div>
   );
 }
+

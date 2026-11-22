@@ -191,12 +191,18 @@ export function Navbar() {
             <Button
                 variant="outline"
                 render={<Link href="/sign-in" />}
+                // The root element is an <a>, not a <button>.
+                nativeButton={false}
                 className="border border-red-600"
               >
                 Sign In
               </Button>
 
-              <Button render={<Link href="/sign-up" />} className="bg-red-600 hover:bg-red-700">
+              <Button
+                render={<Link href="/sign-up" />}
+                nativeButton={false}
+                className="bg-red-600 hover:bg-red-700"
+              >
                 Sign Up
               </Button>
             </>
@@ -273,11 +279,12 @@ export function Navbar() {
             <Button
                 variant="outline"
                 render={<Link href="/sign-in" />}
+                nativeButton={false}
               >
                 Sign In
               </Button>
 
-              <Button render={<Link href="/sign-up" />}>
+              <Button render={<Link href="/sign-up" />} nativeButton={false}>
                 Sign Up
               </Button>
                 </>

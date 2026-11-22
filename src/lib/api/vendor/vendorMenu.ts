@@ -1,4 +1,5 @@
 import type { MenuItem, UpdateMenuData } from "@/type/menu";
+import { authFetch } from "../auth-fetch";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -7,7 +8,7 @@ const apiRequest = async <T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> => {
-  const response = await fetch(`${API_URL}${endpoint}`, {
+  const response = await  authFetch(`${API_URL}${endpoint}`, {
     ...options,
     credentials: "include",
     headers: {

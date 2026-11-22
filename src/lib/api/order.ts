@@ -1,5 +1,7 @@
 
 import type { Order, ApiResponse } from "@/type/order";
+import { authFetch } from "./auth-fetch";
+
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -15,7 +17,7 @@ const request = async (path: string, init?: RequestInit) => {
   let response: Response;
 
   try {
-    response = await fetch(url, init);
+    response = await  authFetch(url, init);
   } catch {
     throw new Error(
       "Could not reach the API. Please make sure the backend server is running."
@@ -41,9 +43,8 @@ const request = async (path: string, init?: RequestInit) => {
 // GET MY ORDERS — GET /api/orders (backend returns the signed-in customer's
 // own orders; there is no `/my-orders` path on the server).
 export const getMyOrders = async (): Promise<Order[]> => {
-  const result = await request("/api/orders", {
+  const result = await authFetch("/api/orders", {
     method: "GET",
-    credentials: "include",
     cache: "no-store",
   });
 
@@ -51,10 +52,11 @@ export const getMyOrders = async (): Promise<Order[]> => {
 };
 
 // GET SINGLE ORDER
-export const getOrderById = async (orderId: string): Promise<Order> => {
-  const result = await request(`/api/orders/${orderId}`, {
+export const getOrderById = async (
+  orderId: string
+): Promise<Order> => {
+  const result = await authFetch(`/api/orders/${orderId}`, {
     method: "GET",
-    credentials: "include",
     cache: "no-store",
   });
 
@@ -64,7 +66,6 @@ export const getOrderById = async (orderId: string): Promise<Order> => {
 
   return result.data as Order;
 };
-
 // CREATE ORDER — delivery date/address are required by the backend.
 export const createOrder = async ({
   menuId,

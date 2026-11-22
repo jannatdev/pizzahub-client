@@ -1,14 +1,12 @@
 
-import type {
-  OrderStatus,
-  VendorOrdersResponse,
-} from "@/type/order";
+import type { VendorOrdersResponse } from "@/type/order";
+import { authFetch } from "@/lib/api/auth-fetch";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 // GET: Fetch vendor orders
 export const getVendorOrders = async (): Promise<VendorOrdersResponse> => {
-  const response = await fetch(`${API_URL}/vendor/orders`, {
+  const response = await authFetch(`${API_URL}/vendor/orders`, {
     method: "GET",
     credentials: "include",
     cache: "no-store",
@@ -28,7 +26,7 @@ export const updateVendorOrderStatus = async (
   id: string,
   status: "Accepted" | "Rejected"
 ) => {
-  const response = await fetch(
+  const response = await authFetch(
     `${API_URL}/vendor/orders/${id}/status`,
     {
       method: "PATCH",

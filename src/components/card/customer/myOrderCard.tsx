@@ -100,9 +100,9 @@ export default function OrderCard({
 
             {/* Item Image */}
             <div className="relative h-40 w-full shrink-0 overflow-hidden rounded-lg bg-muted sm:h-32 sm:w-36">
-              {order.itemImage ? (
+              {order.imageUrl ? (
                 <Image
-                  src={order.itemImage}
+                  src={order.imageUrl}
                   alt={order.itemName}
                   fill
                   sizes="(max-width: 640px) 100vw, 144px"

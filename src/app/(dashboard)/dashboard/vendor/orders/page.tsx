@@ -1,63 +1,64 @@
-
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { toast } from "sonner";
+import { useEffect, useState } from "react";
 
-import type { Order, OrderStatus } from "@/type/order";
+import type { Order } from "@/type/order";
 
-
-
-
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
-import { PagePlaceholder } from "@/components/dashboard/placeholder";
-import { Package, ShoppingBag } from "lucide-react";
+import { AlertCircle, Package, RefreshCw } from "lucide-react";
 import ManageOrderCard from "@/components/card/vendor/manageOrderCard";
 import { getVendorOrders } from "@/lib/api/vendor/vendorOrder";
 
+/**
+ * Vendor "Customer Orders" page.
+ *
+ * Loads GET /vendor/orders once on mount. `loading` always resolves (success,
+ * empty or failure) so the page can never sit behind the skeleton forever, and
+ * a failed read is rendered as a retryable error card instead of an unhandled
+ * promise rejection.
+ */
 export default function OrdersPage() {
-
-   const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
-
-  // const fetchOrders = useCallback(async () => {
-  //   try {
-  //     const result = await getVendorOrders();
-  //     setOrders(result.data);
-  //   } catch (error) {
-  //     toast.error(
-  //       error instanceof Error
-  //         ? error.message
-  //         : "Failed to fetch orders."
-  //     );
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // }, []);
+  const [error, setError] = useState<string | null>(null);
+  // Bumped by the "Try again" button so the effect below re-runs the read.
+  const [reloadToken, setReloadToken] = useState(0);
 
   useEffect(() => {
-  let isMounted = true;
+    let active = true;
 
-  const loadOrders = async () => {
-    const result = await getVendorOrders();
+    // Every setState happens after the await, so the effect body itself never
+    // sets state synchronously — the skeleton shows for exactly one paint.
+    (async () => {
+      try {
+        const result = await getVendorOrders();
 
-    if (isMounted) {
-      setOrders(result.data);
-    }
-  };
+        if (!active) return;
+        setOrders(result.data ?? []);
+        setError(null);
+      } catch (err) {
+        if (!active) return;
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Failed to fetch orders."
+        );
+      } finally {
+        // Success, empty and failure all leave the loading state, so the page
+        // can never get stuck behind the skeleton.
+        if (active) setLoading(false);
+      }
+    })();
 
-  loadOrders();
+    return () => {
+      active = false;
+    };
+  }, [reloadToken]);
 
-  return () => {
-    isMounted = false;
-  };
-}, []);
-  const handleStatusUpdate = (
-    orderId: string,
-    status: OrderStatus
-  ) => {
+  const handleStatusUpdate = (orderId: string, status: Order["status"]) => {
     setOrders((previous) =>
       previous.map((order) =>
         order._id === orderId
@@ -82,16 +83,51 @@ export default function OrdersPage() {
       </div>
     );
   }
+
+  if (error) {
+    return (
+      <section className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">
+            Customer Orders
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Manage and respond to orders received from your customers.
+          </p>
+        </div>
+
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="mb-4 rounded-full bg-red-50 p-4">
+              <AlertCircle className="h-8 w-8 text-red-600" />
+            </div>
+
+            <h2 className="font-semibold">Could not load orders</h2>
+
+            <p className="mt-1 max-w-md text-sm text-muted-foreground">
+              {error}
+            </p>
+
+            <Button
+              variant="outline"
+              className="mt-5"
+              onClick={() => {
+                setLoading(true);
+                setError(null);
+                setReloadToken((token) => token + 1);
+              }}
+            >
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Try again
+            </Button>
+          </CardContent>
+        </Card>
+      </section>
+    );
+  }
+
   return (
-  <div>
-
-     <PagePlaceholder
-      icon={ShoppingBag}
-      title="Customer Orders"
-      description="Accept or reject incoming orders for your menu items."
-    />
-
-     <section className="space-y-6">
+    <section className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">
           Customer Orders
@@ -127,8 +163,5 @@ export default function OrdersPage() {
         </div>
       )}
     </section>
-
-  </div>
-   
   );
 }

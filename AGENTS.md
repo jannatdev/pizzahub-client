@@ -128,6 +128,8 @@ Conventions: `.ts` files run natively via Node ≥23 type stripping (Node 26 in 
 
 Auth sharing rules (both repos): **`BETTER_AUTH_SECRET` (and the Google OAuth credentials) must be identical in both `.env` files.** Better Auth signs the session cookie with that secret, and each app verifies it — if they differ, the Next.js server-side session read (`src/lib/session.ts`) returns `null`, so `/dashboard/**` bounces signed-in users back to `/sign-in`. Likewise, any browser `fetch` from the client to `NEXT_PUBLIC_API_URL` (another origin) must pass `credentials: "include"` or the session cookie is never sent and the API answers 401.
 
+**Auth calls are same-origin; business APIs are cross-origin.** `src/lib/auth-client.ts` intentionally has **no** `baseURL`, so Better Auth browser calls (sign-up, sign-in, sign-out, session) hit the Next app's own `/api/auth/[...all]` route handler on the same origin — that keeps the session cookie first-party and avoids CORS/`trustedOrigins` friction. Only the business API helpers in `src/lib/api/*` go to `NEXT_PUBLIC_API_URL` (port 8000), and those must pass `credentials: "include"`. Do not "fix" the missing `baseURL` by pointing it at the backend.
+
 ## 5. Phase Roadmap (Requirements Reference)
 
 Status markers: ⬜ not started, 🟡 in progress, ✅ done. Update this table as phases complete.

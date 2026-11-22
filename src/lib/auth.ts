@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth";
 import { MongoClient } from "mongodb";
 import { mongodbAdapter } from "@better-auth/mongo-adapter";
 import { z } from "zod";
+import { jwt } from "better-auth/plugins";
 
 
   
@@ -27,12 +28,35 @@ export type UserRole = "customer" | "vendor" | "admin";
 
 
 
+/**
+ * Origins allowed to call this app's Better Auth endpoints. Anything else is
+ * rejected with 403 INVALID_ORIGIN, so both loopback spellings of the dev
+ * server are listed — opening the site as 127.0.0.1:3000 used to make every
+ * sign-in/sign-up fail.
+ */
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+].filter((origin): origin is string => Boolean(origin));
+
 export const auth = betterAuth({
   database: mongodbAdapter(db, {
     client,
   }),
-  trustedOrigins: [
-    process.env.CLIENT_URL || "http://localhost:3000",
+  trustedOrigins: [...new Set(allowedOrigins)],
+    plugins: [
+    jwt({
+      jwt: {
+        definePayload: ({ user }) => ({
+          sub: user.id,
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+        }),
+      },
+    }),
   ],
 
   emailAndPassword: {

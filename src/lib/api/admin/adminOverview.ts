@@ -1,9 +1,11 @@
+import { authFetch } from "../auth-fetch";
+
 const API_URL =process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 
 
 export const getAdminOverview = async () => {
-  const response = await fetch(
+  const response = await authFetch(
     `${API_URL}/api/admin/overview/stats`,
     {
       method: "GET",

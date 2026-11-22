@@ -216,8 +216,8 @@ export default function ManageOrderCard({
             </h3>
 
             <div className="rounded-lg bg-muted/50 p-3 text-sm text-muted-foreground">
-              {order.customerMessage?.trim()
-                ? order.customerMessage
+              {order.additionalMessage?.trim()
+                ? order.additionalMessage
                 : "No additional message from the customer."}
             </div>
           </div>

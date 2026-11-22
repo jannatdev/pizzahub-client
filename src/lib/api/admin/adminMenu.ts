@@ -1,3 +1,4 @@
+import { authFetch } from "../auth-fetch";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -17,7 +18,7 @@ const request = async (path: string, init?: RequestInit) => {
   let response: Response;
 
   try {
-    response = await fetch(url, {
+    response = await authFetch(url, {
       ...init,
       credentials: "include",
     });

@@ -1,3 +1,6 @@
+import { authFetch } from "../auth-fetch";
+
+
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL ||
   "http://localhost:8000";
@@ -61,7 +64,7 @@ export const getAllUsers = async ({
     query.set("role", role);
   }
 
-  const response = await fetch(
+  const response = await authFetch(
     `${API_URL}/api/admin/users?${query.toString()}`,
     {
       method: "GET",
