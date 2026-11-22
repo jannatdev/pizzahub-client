@@ -1,5 +1,6 @@
 "use client";
 
+import { AuthUser } from "@/type/auth";
 import { createContext, useContext, useState, type ReactNode } from "react";
 
 /**
@@ -8,20 +9,8 @@ import { createContext, useContext, useState, type ReactNode } from "react";
  */
 export type UserRole = "customer" | "vendor" | "admin";
 
-export interface AuthUser {
-  name: string;
-  email: string;
-  /** Profile image URL. An empty string renders an initials avatar instead. */
-  image: string;
-  role: UserRole;
-  /**
-   * Vendor plan flag. Resolved server-side in the dashboard shell from the
-   * backend (src/lib/vendor-plan.ts) — undefined for customers/admins and
-   * whenever the plan could not be read. Display-only: the backend is still
-   * the only thing that enforces menu limits.
-   */
-  isPremium?: boolean;
-}
+
+
 
 interface AuthContextValue {
   user: AuthUser | null;
@@ -31,15 +20,6 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-/**
- * TEMPORARY mock user kept around so the signed-in Navbar (avatar dropdown,
- * Dashboard link, Logout) can still be previewed during development.
- *
- * The provider starts *signed out* so the Navbar shows the Sign In / Sign Up
- * buttons by default. To preview the signed-in state, pass `MOCK_USER` as the
- * initial state below. When real auth (Better Auth, Phase 5) lands, the real
- * session replaces this entirely.
- */
 export const MOCK_USER: AuthUser = {
   name: "Jane Doe",
   email: "jane.doe@pizzahub.com",

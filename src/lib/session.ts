@@ -6,9 +6,9 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { auth } from "@/lib/auth";
-import { DASHBOARD_HOME } from "@/lib/dashboard-paths";
-import type { AuthUser, UserRole } from "@/context/auth-context";
-import { exportPages } from "next/dist/export/worker";
+
+import type { UserRole } from "@/context/auth-context";
+import { AuthUser } from "@/type/auth";
 
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -21,15 +21,14 @@ export const getCurrentUser = cache(async (): Promise<AuthUser> => {
     redirect("/sign-in");
   }
 
-  return {
-    name: user.name,
-    email: user.email,
-    image: user.image ?? "",
-   
-    role: (user.role as UserRole | undefined) ?? "customer",
-  };
+return {
+  name: user.name,
+  email: user.email,
+  image: user.image ?? "",
+  role: (user.role as UserRole | undefined) ?? "customer",
+  businessName: "",
+};
 });
-
 export const getToken = async () => {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -69,15 +68,9 @@ export const authFetch = async (
 
   return data;
 };
-/**
- * Same as `getCurrentUser`, but also enforces which role may visit the current
- * route. Anyone with the wrong role is sent to their own dashboard instead.
- *
- * Used by the role-based segment layouts:
- *   /dashboard/customer/**  → requireRole("customer")
- *   /dashboard/vendor/**    → requireRole("vendor")
- *   /dashboard/admin/**     → requireRole("admin")
- */
+
+
+
 export async function requireRole(role: UserRole): Promise<AuthUser> {
   const user = await getCurrentUser();
 
@@ -87,4 +80,3 @@ export async function requireRole(role: UserRole): Promise<AuthUser> {
 
   return user;
 }
-// DASHBOARD_HOME[user.role]

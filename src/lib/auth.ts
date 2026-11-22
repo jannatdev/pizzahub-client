@@ -1,3 +1,5 @@
+import "server-only";
+
 import { betterAuth } from "better-auth";
 import { MongoClient } from "mongodb";
 import { mongodbAdapter } from "@better-auth/mongo-adapter";
@@ -28,12 +30,7 @@ export type UserRole = "customer" | "vendor" | "admin";
 
 
 
-/**
- * Origins allowed to call this app's Better Auth endpoints. Anything else is
- * rejected with 403 INVALID_ORIGIN, so both loopback spellings of the dev
- * server are listed — opening the site as 127.0.0.1:3000 used to make every
- * sign-in/sign-up fail.
- */
+
 const allowedOrigins = [
   process.env.CLIENT_URL,
   "http://localhost:3000",
@@ -70,29 +67,23 @@ export const auth = betterAuth({
         }, 
     },
 
-  user: {
-    additionalFields: {
-     
-      role: {
-        type: "string",
-        required: false,
-        defaultValue: "customer",
-        input: true,
-        validator: {
-          input: z.enum(["customer", "vendor"]),
-        },
-         
-      },
+ user: {
+  additionalFields: {
+    role: {
+      type: "string",
+      required: false,
+      defaultValue: "customer",
+      input: false,
+    },
+    businessName: {
+      type: "string",
+      required: false,
+      input: false,
     },
   },
+},
 
-  /**
-   * Storage-layer guarantees for `role` (defense in depth):
-   * - On create: any value that is not "customer"/"vendor" is forced to
-   *   "customer" — covers sign-up, OAuth and any future user-creation path.
-   * - On update: a payload containing `role` aborts the update — the role is
-   *   chosen at sign-up and can never be changed afterwards.
-   */
+  
   databaseHooks: {
     user: {
       create: {

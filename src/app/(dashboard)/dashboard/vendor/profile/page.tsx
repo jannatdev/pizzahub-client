@@ -1,13 +1,10 @@
-import { Settings } from "lucide-react";
 
-import { PagePlaceholder } from "@/components/dashboard/placeholder";
+import { getCurrentUser } from "@/lib/session";
 
-export default function VendorProfilePage() {
-  return (
-    <PagePlaceholder
-      icon={Settings}
-      title="Profile Settings"
-      description="Update your name, profile image and shop details."
-    />
-  );
+import VendorProfileUpdate from "@/components/dashboard/vendorProfileUpdate";
+
+export default async function VendorProfilePage() {
+  const user = await getCurrentUser();
+
+  return <VendorProfileUpdate user={user} />;
 }
