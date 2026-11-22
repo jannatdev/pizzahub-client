@@ -1,6 +1,9 @@
+
+"use client";
+
+import { useEffect, useState } from "react";
 import AdminOverviewTable from "@/components/card/admin/AdminOverviewTable";
 import { getAdminOverview } from "@/lib/api/admin/adminOverview";
-import { Suspense } from "react";
 
 interface AdminStats {
   totalUsers: number;
@@ -11,16 +14,32 @@ interface AdminStats {
   totalTransactions: number;
 }
 
-
- async function AdminOverviewContent() {
-  const stats = await getAdminOverview();
-
-  return <AdminOverviewTable stats={stats} />;
-}
 export default function AdminOverviewPage() {
+  const [stats, setStats] = useState<AdminStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchOverview = async () => {
+      try {
+        const data = await getAdminOverview();
+        setStats(data);
+      } catch (err) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Failed to fetch dashboard statistics."
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOverview();
+  }, []);
+
   return (
     <div className="space-y-6">
-      {/* Page Heading */}
       <div>
         <h1 className="text-2xl font-bold tracking-tight">
           Admin Overview
@@ -31,16 +50,17 @@ export default function AdminOverviewPage() {
         </p>
       </div>
 
-      {/* Overview Table */}
-      <Suspense
-        fallback={
-          <div className="rounded-xl border p-8 text-center text-muted-foreground">
-            Loading admin overview...
-          </div>
-        }
-      >
-        <AdminOverviewContent />
-      </Suspense>
+      {loading ? (
+        <div className="rounded-xl border p-8 text-center text-muted-foreground">
+          Loading admin overview...
+        </div>
+      ) : error ? (
+        <div className="rounded-xl border border-destructive p-8 text-center text-destructive">
+          {error}
+        </div>
+      ) : stats ? (
+        <AdminOverviewTable stats={stats} />
+      ) : null}
     </div>
   );
 }

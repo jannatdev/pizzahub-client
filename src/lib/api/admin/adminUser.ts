@@ -1,9 +1,5 @@
+
 import { authFetch } from "../auth-fetch";
-
-
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  "http://localhost:8000";
 
 export interface AdminUser {
   id: string;
@@ -37,9 +33,7 @@ export interface UserStatsResponse {
   stats: UserStats;
 }
 
-/**
- * Get all users
- */
+// Get all users
 export const getAllUsers = async ({
   search = "",
   role = "all",
@@ -64,74 +58,45 @@ export const getAllUsers = async ({
     query.set("role", role);
   }
 
-  const response = await authFetch(
-    `${API_URL}/api/admin/users?${query.toString()}`,
+  const result = await authFetch(
+    `/api/admin/users?${query.toString()}`,
     {
       method: "GET",
       cache: "no-store",
     }
   );
 
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      data.message || "Failed to fetch users"
-    );
-  }
-
-  return data;
+  return result as UsersResponse;
 };
 
-/**
- * Get single user
- */
+// Get single user
 export const getUserById = async (
   id: string
 ): Promise<{
   success: boolean;
   user: AdminUser;
 }> => {
-  const response = await fetch(
-    `${API_URL}/api/admin/users/${id}`,
+  const result = await authFetch(
+    `/api/admin/users/${encodeURIComponent(id)}`,
     {
       method: "GET",
       cache: "no-store",
     }
   );
 
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      data.message || "Failed to fetch user"
-    );
-  }
-
-  return data;
+  return result;
 };
 
-/**
- * Get user statistics
- */
+// Get user statistics
 export const getUserStats =
   async (): Promise<UserStatsResponse> => {
-    const response = await fetch(
-      `${API_URL}/api/admin/users/stats`,
+    const result = await authFetch(
+      "/api/admin/users/stats",
       {
         method: "GET",
         cache: "no-store",
       }
     );
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(
-        data.message ||
-          "Failed to fetch user statistics"
-      );
-    }
-
-    return data;
+    return result as UserStatsResponse;
   };

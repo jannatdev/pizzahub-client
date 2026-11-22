@@ -73,31 +73,9 @@ export const AdminUsersTable = () => {
   });
 
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [category, setCategory] = useState<string>("all");
+  
   const limit=10;
-  // const [limit, setLimit] = useState(10);
-
-// const fetchUsers = async () => {
-//   try {
-//     setLoading(true);
-
-//     const data = await getAllUsers({
-//       page,
-//       limit,
-//       search: search.trim(),
-//       role,
-//     });
-
-//     setUsers(data.users);
-//     setPagination(data.pagination);
-//   } catch (error) {
-//     console.error("Fetch users error:", error);
-//     setUsers([]);
-//   } finally {
-//     setLoading(false);
-//   }
-// };
-
+ 
 useEffect(() => {
   let ignore = false;
 
@@ -133,14 +111,16 @@ useEffect(() => {
   };
 }, [page, limit, search, role]);
 
+const handleRoleChange = (value: string | null) => {
+  setRole(value ?? "all");
+  setPage(1);
+};
+
 const handleSearch = (value: string) => {
   setSearch(value);
   setPage(1);
 };
 
-const handleCategoryChange = (value: string | null) => {
-  setCategory(value ?? "all");
-};
 
 const getRoleBadge = (userRole: User["role"]) => {
   if (userRole === "admin") {
@@ -191,8 +171,8 @@ const getRoleBadge = (userRole: User["role"]) => {
 
         {/* Role Filter */}
         <Select
-          value={role}
-           onValueChange={handleCategoryChange}
+           value={role}
+            onValueChange={handleRoleChange}
         >
           <SelectTrigger className="w-full md:w-[180px]">
             <SelectValue placeholder="Filter by role" />

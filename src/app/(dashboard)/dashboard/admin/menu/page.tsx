@@ -1,8 +1,13 @@
+
 "use client";
 
-import {  useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
-import { RefreshCw, Search, UtensilsCrossed } from "lucide-react";
+import {
+  RefreshCw,
+  Search,
+  UtensilsCrossed,
+} from "lucide-react";
 
 import ManageMenuCard, {
   type MenuItem,
@@ -17,96 +22,157 @@ import {
 
 type FilterStatus = "All" | "Pending" | "Approved" | "Rejected";
 
-export default function ManageMenuItemsPage() {
+// Extract the menu array from different possible API response structures.
+const extractMenus = (response: unknown): MenuItem[] => {
+  if (Array.isArray(response)) {
+    return response as MenuItem[];
+  }
 
-    const [menus, setMenus] = useState<MenuItem[]>([]);
+  if (!response || typeof response !== "object") {
+    return [];
+  }
+
+  const data = response as Record<string, unknown>;
+
+  // Common API response structures
+  const possibleArrays = [
+    data.menus,
+    data.menuItems,
+    data.items,
+    data.data,
+  ];
+
+  for (const item of possibleArrays) {
+    if (Array.isArray(item)) {
+      return item as MenuItem[];
+    }
+
+    // Handle nested response: { data: { menus: [...] } }
+    if (item && typeof item === "object") {
+      const nested = item as Record<string, unknown>;
+
+      if (Array.isArray(nested.menus)) {
+        return nested.menus as MenuItem[];
+      }
+
+      if (Array.isArray(nested.menuItems)) {
+        return nested.menuItems as MenuItem[];
+      }
+
+      if (Array.isArray(nested.items)) {
+        return nested.items as MenuItem[];
+      }
+    }
+  }
+
+  return [];
+};
+
+export default function ManageMenuItemsPage() {
+  const [menus, setMenus] = useState<MenuItem[]>([]);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<FilterStatus>("All");
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState<string | null>(null);
 
+  // Fetch all menu items
+  const fetchMenus = useCallback(async () => {
+  try {
+    const response = await getAllMenuItems();
 
-  // No setState runs before the await, so calling this from the effect is
-  // safe (react-hooks/set-state-in-effect): every update lands in the async
-  // continuation once the response arrives.
-  // const fetchMenus = useCallback(async () => {
-  //   try {
-  //     const data = await getAllMenuItems();
+    console.log("Admin menu API response:", response);
 
-  //     setMenus(Array.isArray(data) ? data : data.menus ?? []);
-  //   } catch (error) {
-  //     console.error(error);
-  //     toast.error("Failed to load menu items");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // }, []);
+    const menuList = extractMenus(response);
 
- useEffect(() => {
-  let ignore = false;
+    setMenus(menuList);
+  } catch (error) {
+    console.error("Failed to fetch menus:", error);
 
-  const loadMenus = async () => {
-    try {
-      const data = await getAllMenuItems();
+    setMenus([]);
 
-      if (!ignore) {
-        setMenus(data.menus);
-      }
-    } catch (error) {
-      if (!ignore) {
-        console.error("Failed to fetch menus:", error);
-        setMenus([]);
-      }
-    } finally {
-      if (!ignore) {
-        setLoading(false);
-      }
-    }
-  };
-
-  loadMenus();
-
-  return () => {
-    ignore = true;
-  };
+    toast.error(
+      error instanceof Error
+        ? error.message
+        : "Failed to load menu items."
+    );
+  } finally {
+    setLoading(false);
+  }
 }, []);
 
-  // Refresh button: show the spinner first (event handler, not an effect).
+  
+  useEffect(() => {
+  const timer = setTimeout(() => {
+    fetchMenus();
+  }, 0);
+
+  return () => clearTimeout(timer);
+}, [fetchMenus]);
+  // Refresh menus
   const refresh = () => {
-    setLoading(true);
-    
+    fetchMenus();
   };
 
+  // Approve menu
   const handleApprove = async (id: string) => {
     try {
       setProcessingId(id);
+
       await approveMenu(id);
-      toast.success("Menu item approved successfully");
-      
+
+      setMenus((previousMenus) =>
+        previousMenus.map((menu) =>
+          menu._id === id
+            ? { ...menu, status: "Approved" }
+            : menu
+        )
+      );
+
+      toast.success("Menu item approved successfully.");
     } catch (error) {
-      console.error(error);
-      toast.error("Failed to approve menu item");
+      console.error("Approve menu error:", error);
+
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to approve menu item."
+      );
     } finally {
       setProcessingId(null);
     }
   };
 
-
-   const handleReject = async (id: string) => {
+  // Reject menu
+  const handleReject = async (id: string) => {
     try {
       setProcessingId(id);
+
       await rejectMenu(id);
-      toast.success("Menu item rejected successfully");
-     
+
+      setMenus((previousMenus) =>
+        previousMenus.map((menu) =>
+          menu._id === id
+            ? { ...menu, status: "Rejected" }
+            : menu
+        )
+      );
+
+      toast.success("Menu item rejected successfully.");
     } catch (error) {
-      console.error(error);
-      toast.error("Failed to reject menu item");
+      console.error("Reject menu error:", error);
+
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to reject menu item."
+      );
     } finally {
       setProcessingId(null);
     }
   };
 
-    const handleDelete = async (id: string) => {
+  // Delete menu
+  const handleDelete = async (id: string) => {
     const confirmed = window.confirm(
       "Are you sure you want to delete this menu item?"
     );
@@ -115,39 +181,55 @@ export default function ManageMenuItemsPage() {
 
     try {
       setProcessingId(id);
+
       await deleteMenu(id);
-      toast.success("Menu item deleted successfully");
-     
+
+      setMenus((previousMenus) =>
+        previousMenus.filter((menu) => menu._id !== id)
+      );
+
+      toast.success("Menu item deleted successfully.");
     } catch (error) {
-      console.error(error);
-      toast.error("Failed to delete menu item");
+      console.error("Delete menu error:", error);
+
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to delete menu item."
+      );
     } finally {
       setProcessingId(null);
     }
   };
 
-
-     const filteredMenus = menus.filter((menu) => {
+  // Search and status filtering
+  const filteredMenus = menus.filter((menu) => {
     const matchesFilter =
       filter === "All" || menu.status === filter;
 
-    const searchText = search.toLowerCase();
+    const searchText = search.toLowerCase().trim();
 
-    const matchesSearch = [
+    const searchableFields = [
       menu.itemName,
       menu.category,
       menu.vendorName,
       menu.vendorEmail,
       menu.location,
-    ]
-      .filter(Boolean)
-      .some((value) => value.toLowerCase().includes(searchText));
+    ];
+
+    const matchesSearch = searchableFields.some((value) =>
+      String(value ?? "").toLowerCase().includes(searchText)
+    );
 
     return matchesFilter && matchesSearch;
   });
 
-    const stats = [
-    { label: "Total Menus", value: menus.length },
+  // Statistics
+  const stats = [
+    {
+      label: "Total Menus",
+      value: menus.length,
+    },
     {
       label: "Pending",
       value: menus.filter((menu) => menu.status === "Pending").length,
@@ -161,6 +243,7 @@ export default function ManageMenuItemsPage() {
       value: menus.filter((menu) => menu.status === "Rejected").length,
     },
   ];
+
   return (
     <div className="space-y-6 p-4 md:p-6">
       {/* Header */}
@@ -169,6 +252,7 @@ export default function ManageMenuItemsPage() {
           <h1 className="text-2xl font-bold text-gray-900">
             Manage Menu Items
           </h1>
+
           <p className="mt-1 text-sm text-gray-500">
             Review, approve, reject, and manage vendor menu items.
           </p>
@@ -178,9 +262,12 @@ export default function ManageMenuItemsPage() {
           type="button"
           onClick={refresh}
           disabled={loading}
-          className="flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition hover:bg-gray-50 disabled:opacity-50"
+          className="flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
+          <RefreshCw
+            size={16}
+            className={loading ? "animate-spin" : ""}
+          />
           Refresh
         </button>
       </div>
@@ -192,7 +279,10 @@ export default function ManageMenuItemsPage() {
             key={stat.label}
             className="rounded-xl border bg-white p-4 shadow-sm"
           >
-            <p className="text-sm text-gray-500">{stat.label}</p>
+            <p className="text-sm text-gray-500">
+              {stat.label}
+            </p>
+
             <p className="mt-2 text-2xl font-bold text-gray-900">
               {stat.value}
             </p>
@@ -207,10 +297,11 @@ export default function ManageMenuItemsPage() {
             size={18}
             className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
           />
+
           <input
             type="text"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(event) => setSearch(event.target.value)}
             placeholder="Search by menu, category, vendor..."
             className="w-full rounded-lg border py-2.5 pl-10 pr-4 text-sm outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100"
           />
@@ -218,7 +309,9 @@ export default function ManageMenuItemsPage() {
 
         <select
           value={filter}
-          onChange={(e) => setFilter(e.target.value as FilterStatus)}
+          onChange={(event) =>
+            setFilter(event.target.value as FilterStatus)
+          }
           className="rounded-lg border px-4 py-2.5 text-sm outline-none focus:border-red-500"
         >
           <option value="All">All Status</option>
@@ -240,11 +333,15 @@ export default function ManageMenuItemsPage() {
               size={36}
               className="mx-auto text-gray-300"
             />
+
             <h3 className="mt-3 font-semibold text-gray-800">
               No menu items found
             </h3>
+
             <p className="mt-1 text-sm text-gray-500">
-              Try changing your search or filter.
+              {menus.length === 0
+                ? "There are currently no menu items available."
+                : "Try changing your search or filter."}
             </p>
           </div>
         ) : (

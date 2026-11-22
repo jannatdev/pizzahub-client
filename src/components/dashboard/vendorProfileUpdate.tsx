@@ -198,6 +198,8 @@ export default function VendorProfileUpdate({
                   <Image
                     src={preview || imageUrl}
                     alt="Profile"
+                    width={25}
+                    height={25}
                     className="h-24 w-24 rounded-full border border-red-200 object-cover"
                   />
                 ) : (

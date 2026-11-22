@@ -32,28 +32,28 @@ type ManageMenuCardProps = {
   onDelete: (id: string) => void;
 };
 
-const manageMenuCard = ({
+const statusStyles: Record<MenuItem["status"], string> = {
+  Pending: "bg-yellow-100 text-yellow-700",
+  Approved: "bg-green-100 text-green-700",
+  Rejected: "bg-red-100 text-red-700",
+};
+
+const ManageMenuCard = ({
   menu,
   processing,
   onApprove,
   onReject,
   onDelete,
 }: ManageMenuCardProps) => {
-
-     const statusStyles = {
-    Pending: "bg-yellow-100 text-yellow-700",
-    Approved: "bg-green-100 text-green-700",
-    Rejected: "bg-red-100 text-red-700",
-  };
-    return (
-       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition hover:shadow-md">
+  return (
+    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition hover:shadow-md">
       <div className="flex flex-col gap-5 p-4 sm:flex-row">
         {/* Menu Image */}
         <div className="relative h-40 w-full shrink-0 overflow-hidden rounded-lg bg-gray-100 sm:h-36 sm:w-40">
           {menu.imageUrl ? (
             <Image
               src={menu.imageUrl}
-              alt={menu.itemName}
+              alt={menu.itemName || "Menu item"}
               fill
               unoptimized
               className="object-cover"
@@ -61,7 +61,7 @@ const manageMenuCard = ({
             />
           ) : (
             <div className="flex h-full items-center justify-center text-sm text-gray-400">
-              No image
+              No image available
             </div>
           )}
         </div>
@@ -69,22 +69,22 @@ const manageMenuCard = ({
         {/* Menu Details */}
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
+            <div className="min-w-0">
               <p className="text-xs font-semibold uppercase tracking-wide text-red-600">
-                {menu.category}
+                {menu.category || "Uncategorized"}
               </p>
 
               <h3 className="mt-1 text-xl font-bold text-gray-900">
-                {menu.itemName}
+                {menu.itemName || "Untitled menu"}
               </h3>
 
               <p className="mt-1 text-sm text-gray-600">
-                {menu.description}
+                {menu.description || "No description available."}
               </p>
             </div>
 
             <span
-              className={`rounded-full px-3 py-1 text-xs font-semibold ${
+              className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${
                 statusStyles[menu.status]
               }`}
             >
@@ -99,17 +99,17 @@ const manageMenuCard = ({
           <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm text-gray-500">
             <span className="flex items-center gap-1">
               <MapPin size={15} />
-              {menu.location}
+              {menu.location || "Location unavailable"}
             </span>
 
             <span className="flex items-center gap-1">
               <Store size={15} />
-              {menu.vendorName}
+              {menu.vendorName || "Unknown vendor"}
             </span>
 
-            <span className="flex items-center gap-1">
+            <span className="flex items-center gap-1 break-all">
               <Mail size={15} />
-              {menu.vendorEmail}
+              {menu.vendorEmail || "Email unavailable"}
             </span>
           </div>
         </div>
@@ -118,7 +118,7 @@ const manageMenuCard = ({
       {/* Actions */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-gray-100 bg-gray-50 px-4 py-3">
         <p className="text-xs text-gray-500">
-          Publisher: {menu.vendorName}
+          Publisher: {menu.vendorName || "Unknown vendor"}
         </p>
 
         <div className="flex flex-wrap gap-2">
@@ -158,7 +158,7 @@ const manageMenuCard = ({
         </div>
       </div>
     </div>
-    );
+  );
 };
 
-export default manageMenuCard;
+export default ManageMenuCard;

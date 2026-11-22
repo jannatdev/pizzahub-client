@@ -43,7 +43,7 @@ const request = async (path: string, init?: RequestInit) => {
 // GET MY ORDERS — GET /api/orders (backend returns the signed-in customer's
 // own orders; there is no `/my-orders` path on the server).
 export const getMyOrders = async (): Promise<Order[]> => {
-  const result = await authFetch("/api/orders", {
+ const result = await authFetch("/api/orders/my-orders", {
     method: "GET",
     cache: "no-store",
   });
@@ -55,7 +55,7 @@ export const getMyOrders = async (): Promise<Order[]> => {
 export const getOrderById = async (
   orderId: string
 ): Promise<Order> => {
-  const result = await authFetch(`api/orders/${orderId}`, {
+ const result = await authFetch(`/api/orders/${orderId}`, {
     method: "GET",
     cache: "no-store",
   });
@@ -107,7 +107,7 @@ export const createOrder = async ({
 
 // CANCEL ORDER — only Pending orders can be cancelled (backend enforces).
 export const cancelOrder = async (orderId: string): Promise<Order> => {
-  const result = await request(`/api/orders/${orderId}/cancel`, {
+  const result = await authFetch(`/api/orders/${orderId}/cancel`, {
     method: "PATCH",
     credentials: "include",
   });
