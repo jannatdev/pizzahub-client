@@ -104,7 +104,7 @@ const BrowseMenuPage = () => {
   }, [search, category, location, sort]);
 
   return (
-    <section className="space-y-8 max-w-7xl mx-auto">
+    <section className="space-y-8 max-w-7xl mx-auto mb-20">
       {/* Page Heading */}
       <div className="space-y-3 text-center">
         <span className="inline-block rounded-full bg-orange-500/15 px-4 py-1.5 text-sm font-semibold text-red-600 ring-1 ring-orange-500/30">

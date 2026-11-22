@@ -55,7 +55,7 @@ export const getMyOrders = async (): Promise<Order[]> => {
 export const getOrderById = async (
   orderId: string
 ): Promise<Order> => {
-  const result = await authFetch(`/api/orders/${orderId}`, {
+  const result = await authFetch(`api/orders/${orderId}`, {
     method: "GET",
     cache: "no-store",
   });
