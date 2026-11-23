@@ -34,6 +34,7 @@ import { cn } from "@/lib/utils";
 import { signOut, useSession } from "@/lib/auth-client";
 import { DASHBOARD_HOME } from "@/lib/dashboard-paths";
 import { toast } from "sonner";
+import ProfileInfoDialog from "../profile-update-dialogue";
 
 /**
  * Better Auth's client types only expose the core user fields. `role` is
@@ -180,7 +181,12 @@ export function Navbar() {
                   >
                     <Settings className="size-4" />
                     Profile Settings
-                  </DropdownMenuItem>
+                   <ProfileInfoDialog
+                      name={user.name}
+                      email={user.email}
+                      image={user.image}
+                    />
+                   </DropdownMenuItem>
 
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="size-4" />
