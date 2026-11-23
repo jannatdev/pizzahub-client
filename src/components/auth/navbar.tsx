@@ -82,6 +82,7 @@ export function Navbar() {
   const links = [
     { label: "Home", href: "/" },
     { label: "Browse Menu", href: "/browse-menu" },
+    { label: "Contact", href: "/Contact" },
     
   ];
 
