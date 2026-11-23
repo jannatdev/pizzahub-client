@@ -19,10 +19,7 @@ import {
   AvatarImage,
 } from "@/components/ui/avatar";
 
-import {
-  Button,
-  buttonVariants,
-} from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 
 import {
   DropdownMenu,
@@ -57,13 +54,6 @@ type SessionUser = {
   role?: UserRole;
 };
 
-interface UserDropdownProps {
-  user: SessionUser;
-  onProfileClick: () => void;
-  onLogout: () => void;
-  onDashboard: () => void;
-}
-
 function getInitials(name: string): string {
   return name
     .split(" ")
@@ -73,82 +63,8 @@ function getInitials(name: string): string {
     .toUpperCase();
 }
 
-// Declare this component OUTSIDE Navbar
-function UserDropdown({
-  user,
-  onProfileClick,
-  onLogout,
-  onDashboard,
-}: UserDropdownProps) {
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        className={cn(
-          buttonVariants({ variant: "ghost" }),
-          "h-9 gap-2 px-2"
-        )}
-      >
-        <Avatar className="size-8">
-          {user.image && (
-            <AvatarImage src={user.image} alt={user.name} />
-          )}
-
-          <AvatarFallback className="bg-red-100 text-xs font-semibold text-red-700">
-            {getInitials(user.name || "User")}
-          </AvatarFallback>
-        </Avatar>
-
-        <span className="max-w-28 truncate text-sm font-medium">
-          {user.name}
-        </span>
-
-        <ChevronDown className="size-4 opacity-60" />
-      </DropdownMenuTrigger>
-
-      <DropdownMenuContent align="end" className="w-56 bg-white">
-        <DropdownMenuLabel className="font-normal">
-          <span className="block truncate text-sm font-semibold">
-            {user.name}
-          </span>
-
-          <span className="block truncate text-xs text-muted-foreground">
-            {user.email}
-          </span>
-        </DropdownMenuLabel>
-
-        <DropdownMenuSeparator />
-
-        <DropdownMenuItem
-          className="cursor-pointer"
-          onSelect={onDashboard}
-        >
-          <LayoutDashboard className="size-4 text-red-500" />
-          Dashboard
-        </DropdownMenuItem>
-
-        <DropdownMenuItem
-          className="cursor-pointer"
-          onSelect={onProfileClick}
-        >
-          <Settings className="size-4 text-red-500" />
-          Profile Settings
-        </DropdownMenuItem>
-
-        <DropdownMenuItem
-          className="cursor-pointer"
-          onSelect={onLogout}
-        >
-          <LogOut className="size-4 text-red-500" />
-          Logout
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-}
-
 export function Navbar() {
   const { data: session } = useSession();
-
   const user = session?.user as SessionUser | undefined;
 
   const [profileOpen, setProfileOpen] = useState(false);
@@ -215,15 +131,60 @@ export function Navbar() {
           ))}
         </nav>
 
-        {/* Desktop Auth */}
+        {/* Desktop Authentication */}
         <div className="hidden items-center gap-2 md:flex">
           {user ? (
-            <UserDropdown
-              user={user}
-              onProfileClick={() => setProfileOpen(true)}
-              onLogout={handleLogout}
-              onDashboard={handleDashboard}
-            />
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                className={cn(
+                  buttonVariants({ variant: "ghost" }),
+                  "h-9 gap-2 px-2"
+                )}
+              >
+                <Avatar className="size-7">
+                  {user.image && (
+                    <AvatarImage src={user.image} alt={user.name} />
+                  )}
+                  <AvatarFallback className="bg-red-100 text-xs font-semibold text-red-700">
+                    {getInitials(user.name || "User")}
+                  </AvatarFallback>
+                </Avatar>
+
+                <span className="max-w-28 truncate text-sm font-medium">
+                  {user.name}
+                </span>
+
+                <ChevronDown className="size-4 opacity-60" />
+              </DropdownMenuTrigger>
+
+              <DropdownMenuContent align="end" className="z-[100] w-56 bg-white">
+                <DropdownMenuLabel className="font-normal">
+                  <span className="block truncate text-sm font-semibold">
+                    {user.name}
+                  </span>
+                  <span className="block truncate text-xs text-muted-foreground">
+                    {user.email}
+                  </span>
+                </DropdownMenuLabel>
+
+                <DropdownMenuSeparator />
+
+                <DropdownMenuItem onSelect={handleDashboard}>
+                  <LayoutDashboard className="size-4 text-red-500" />
+                  Dashboard
+                </DropdownMenuItem>
+
+                <DropdownMenuItem onSelect={() => setProfileOpen(true)}>
+                  <Settings className="size-4 text-red-500" />
+                  Profile Settings
+                </DropdownMenuItem>
+
+                <DropdownMenuItem onSelect={handleLogout}>
+                  <LogOut className="size-4 text-red-500" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
             <>
               <Button
@@ -253,19 +214,14 @@ export function Navbar() {
             <span className="sr-only">Open menu</span>
           </SheetTrigger>
 
-          <SheetContent
-            side="right"
-            className="flex w-72 flex-col gap-4"
-          >
+          <SheetContent side="right" className="flex w-72 flex-col gap-4">
             <SheetHeader>
               <SheetTitle>PizzaHub Menu</SheetTitle>
-
               <SheetDescription className="sr-only">
                 Navigation menu
               </SheetDescription>
             </SheetHeader>
 
-            {/* Mobile Navigation */}
             <nav className="flex flex-col gap-1">
               {links.map((link) => (
                 <Link
@@ -283,15 +239,57 @@ export function Navbar() {
               ))}
             </nav>
 
-            {/* Mobile Auth */}
             <div className="border-t pt-4">
               {user ? (
-                <UserDropdown
-                  user={user}
-                  onProfileClick={() => setProfileOpen(true)}
-                  onLogout={handleLogout}
-                  onDashboard={handleDashboard}
-                />
+                <div className="space-y-2">
+                  {/* User information */}
+                  <div className="flex items-center gap-3 px-2 py-2">
+                    <Avatar className="size-9">
+                      {user.image && (
+                        <AvatarImage src={user.image} alt={user.name} />
+                      )}
+                      <AvatarFallback className="bg-red-100 text-red-600">
+                        {getInitials(user.name || "User")}
+                      </AvatarFallback>
+                    </Avatar>
+
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold">
+                        {user.name}
+                      </p>
+                      <p className="truncate text-xs text-muted-foreground">
+                        {user.email}
+                      </p>
+                    </div>
+                  </div>
+
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start gap-2"
+                    onClick={handleDashboard}
+                  >
+                    <LayoutDashboard className="size-4 text-red-500" />
+                    Dashboard
+                  </Button>
+
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start gap-2"
+                    onClick={() => setProfileOpen(true)}
+                  >
+                    <Settings className="size-4 text-red-500" />
+                    Profile Settings
+                  </Button>
+
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start gap-2"
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="size-4 text-red-500" />
+                    Logout
+                  </Button>
+                </div>
               ) : (
                 <div className="flex flex-col gap-2">
                   <Button
@@ -317,7 +315,7 @@ export function Navbar() {
         </Sheet>
       </div>
 
-      {/* One Profile Dialog for Desktop and Mobile */}
+      {/* Render the profile dialog only once */}
       {user && (
         <ProfileInfoDialog
           open={profileOpen}
