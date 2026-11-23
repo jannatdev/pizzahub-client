@@ -64,10 +64,6 @@ const SignInForm = () => {
 
       toast.success("Login successful!");
 
-      // Better Auth returns the signed-in user in both responses. The freshly
-      // read session is the source of truth; the sign-in response is the
-      // fallback. `role` is an additional field, so it is read defensively and
-      // defaults to "customer".
       const sessionUser = sessionResult.data.user as typeof sessionResult.data.user & {
         role?: UserRole;
       };
@@ -77,7 +73,7 @@ const SignInForm = () => {
       const role = sessionUser.role ?? signInUser.role ?? "customer";
 
       // Each role lands on its own dashboard overview page.
-      router.push(DASHBOARD_HOME[role]);
+      router.push('DASHBOARD_HOME[role]');
       router.refresh();
     } catch (error) {
       console.error("Sign in error:", error);
@@ -149,16 +145,7 @@ const SignInForm = () => {
 
           {/* Password */}
           <div className="space-y-2">
-            {/* <div className="flex items-center justify-between">
-              <Label htmlFor="password">Password</Label>
-
-              <Link
-                href="/forgot-password"
-                className="text-sm font-medium text-red-600 hover:text-red-700"
-              >
-                Forgot password?
-              </Link>
-            </div> */}
+       
 
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />

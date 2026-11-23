@@ -33,6 +33,7 @@ import {  type UserRole } from "@/context/auth-context";
 import { cn } from "@/lib/utils";
 import { signOut, useSession } from "@/lib/auth-client";
 import { DASHBOARD_HOME } from "@/lib/dashboard-paths";
+import { toast } from "sonner";
 
 /**
  * Better Auth's client types only expose the core user fields. `role` is
@@ -70,6 +71,7 @@ export function Navbar() {
     await signOut({
       fetchOptions: {
         onSuccess: () => {
+          toast.success("Log out is success!")
           router.push("/");
           router.refresh();
         },

@@ -109,12 +109,7 @@ export default function SignUpForm(){
         profileImage = uploadResult.imageUrl;
       }
 
-      // Better Auth signup. `role` is sent because src/lib/auth.ts declares
-      // it as an input field — the server only accepts "customer" | "vendor"
-      // (anything else, e.g. a crafted "admin", is rejected there).
-      // Built as a variable first: the client's request type does not know
-      // about the custom `role` field, so the extra property is only checked
-      // against this object, not against the endpoint's parameter.
+   
       const payload = {
         name,
         email: trimmedEmail,
