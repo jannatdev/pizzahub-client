@@ -47,7 +47,7 @@ import {
 import { type UserRole } from "@/context/auth-context";
 import { cn } from "@/lib/utils";
 import { signOut, useSession } from "@/lib/auth-client";
-import { DASHBOARD_HOME } from "@/lib/dashboard-paths";
+import { DASHBOARD_HOME, PROFILE_HOME } from "@/lib/dashboard-paths";
 import { toast } from "sonner";
 
 import ProfileInfoDialog from "../profile-update-dialogue";
@@ -95,15 +95,16 @@ export function Navbar() {
   };
 
   const handleDashboard = () => {
-    if (!user) return;
+  if (!user) return;
 
-    router.push(DASHBOARD_HOME[user.role ?? "customer"]);
-  };
+  router.push(DASHBOARD_HOME[user.role ?? "customer"]);
+};
 
-  const handleProfile = () => {
-    setProfileOpen(true);
-  };
+const handleProfile = () => {
+  if (!user) return;
 
+  router.push(PROFILE_HOME[user.role ?? "customer"]);
+};
   const links = [
     { label: "Home", href: "/" },
     { label: "Browse Menu", href: "/browse-menu" },
@@ -152,40 +153,40 @@ export function Navbar() {
           <div className="hidden items-center gap-2 md:flex">
             {user ? (
              
-              <DropdownMenu>
-                <DropdownMenuTrigger
-                  type="button"
-                  className="inline-flex h-10 items-center gap-2 rounded-md px-2 outline-none transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-red-500"
-                >
-                  <Avatar className="size-7">
-                    {user.image && (
-                      <AvatarImage
-                        src={user.image}
-                        alt={user.name}
-                      />
-                    )}
+              
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                type="button"
+                className="inline-flex h-10 items-center gap-2 rounded-md px-2 outline-none transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-red-500"
+              >
+                <Avatar className="size-7">
+                  {user.image && (
+                    <AvatarImage
+                      src={user.image}
+                      alt={user.name}
+                    />
+                  )}
 
-                    <AvatarFallback className="bg-red-100 text-xs font-semibold text-red-700">
-                      {getInitials(user.name || "User")}
-                    </AvatarFallback>
-                  </Avatar>
+                  <AvatarFallback className="bg-red-100 text-xs font-semibold text-red-700">
+                    {getInitials(user.name || "User")}
+                  </AvatarFallback>
+                </Avatar>
 
-                  <span className="max-w-28 truncate text-sm font-medium">
-                    {user.name}
-                  </span>
+                <span className="max-w-28 truncate text-sm font-medium">
+                  {user.name}
+                </span>
 
-                  <ChevronDown className="size-4 opacity-60" />
-                </DropdownMenuTrigger>
+                <ChevronDown className="size-4 opacity-60" />
+              </DropdownMenuTrigger>
 
-                <DropdownMenuContent
-                  align="end"
-                  side="bottom"
-                  sideOffset={8}
-                  className="z-[100] w-56 bg-white"
-                >
-
-                  <DropdownMenuGroup>
-                      <DropdownMenuLabel className="font-normal">
+              <DropdownMenuContent
+                align="end"
+                side="bottom"
+                sideOffset={8}
+                className="z-[100] w-56 bg-white"
+              >
+                <DropdownMenuGroup>
+                  <DropdownMenuLabel className="font-normal">
                     <span className="block truncate text-sm font-semibold">
                       {user.name}
                     </span>
@@ -194,33 +195,32 @@ export function Navbar() {
                       {user.email}
                     </span>
                   </DropdownMenuLabel>
+                </DropdownMenuGroup>
 
-                  </DropdownMenuGroup>
-                
+                <DropdownMenuSeparator />
 
-                  <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleDashboard}>
+                  <LayoutDashboard className="mr-2 size-4 text-red-500" />
+                  Dashboard
+                </DropdownMenuItem>
 
-                  <DropdownMenuItem onSelect={handleDashboard}>
-                    <LayoutDashboard className="mr-2 size-4 text-red-500" />
-                    Dashboard
-                  </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleProfile}>
+                  <Settings className="mr-2 size-4 text-red-500" />
+                  Profile Settings
+                </DropdownMenuItem>
 
-                  <DropdownMenuItem onSelect={handleProfile}>
-                    <Settings className="mr-2 size-4 text-red-500" />
-                    Profile Settings
-                  </DropdownMenuItem>
+                <DropdownMenuSeparator />
 
-                  <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={handleLogout}
+                  className="text-red-600 focus:text-red-600"
+                >
+                  <LogOut className="mr-2 size-4" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-                  <DropdownMenuItem
-                    onSelect={handleLogout}
-                    className="text-red-600 focus:text-red-600"
-                  >
-                    <LogOut className="mr-2 size-4" />
-                    Logout
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
 
             ) : (
               <>

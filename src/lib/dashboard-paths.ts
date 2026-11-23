@@ -14,3 +14,8 @@ export const DASHBOARD_HOME: Record<UserRole, string> = {
   customer: "/dashboard/customer/overview",
 
 };
+export const PROFILE_HOME: Record<UserRole, string> = {
+  admin: "/dashboard/admin/profile",
+  vendor: "/dashboard/vendor/profile",
+  customer: "/dashboard/customer/profile",
+};
