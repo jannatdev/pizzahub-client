@@ -326,7 +326,7 @@ export default function TransactionsPage() {
 
   return (
 
-    <div>
+    <div className="bg-red-50/25">
 
        <PagePlaceholder
       icon={Receipt}

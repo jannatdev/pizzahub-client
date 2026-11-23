@@ -5,6 +5,7 @@ import { DashboardLayout } from "@/components/dashboard/layout";
 import { DashboardSkeleton } from "@/components/dashboard/skeleton";
 import { getCurrentUser } from "@/lib/session";
 import { getVendorPlan } from "@/lib/vendor-plan";
+import Footer from "@/components/homepage/footer";
 
 /**
  * Shell for every /dashboard/** route.
@@ -33,10 +34,12 @@ async function AuthorizedShell({ children }: { children: ReactNode }) {
   const plan = user.role === "vendor" ? await getVendorPlan() : null;
 
   return (
-    <div className="bg-red-50">
+    <div className="bg-red-50 ">
       <DashboardLayout user={{ ...user, isPremium: plan?.isPremium ?? false }}>
         {children}
+          <Footer></Footer>
       </DashboardLayout>
+    
     </div>
   );
 }

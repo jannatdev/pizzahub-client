@@ -245,7 +245,7 @@ export default function ManageMenuItemsPage() {
   ];
 
   return (
-    <div className="space-y-6 p-4 md:p-6">
+    <div className="space-y-6 p-4 md:p-6 bg-red-50/25">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>

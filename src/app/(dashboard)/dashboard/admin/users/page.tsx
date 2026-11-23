@@ -5,17 +5,23 @@ import AdminUsersTable from "@/components/card/admin/adminUsersTable";
 
 export default function ManageUsersPage() {
   return (
-    <div>
-       <PagePlaceholder
+    <div className="bg-red-50/25 py-10 px-5 rounded-2xl">
+
+      <div className="bg-red-50/25">
+         <PagePlaceholder
       icon={Users}
       title="Manage Users"
       description="Search, filter, block and unblock customers and vendors."
+      
     />
 
-        <div className="space-y-6 p-6">
+      </div>
+      
+
+        <div className="space-y-6 p-6 ">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">
+      <div >
+        <h1 className="text-2xl text-black font-bold tracking-tight">
           Manage Users
         </h1>
 

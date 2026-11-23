@@ -39,19 +39,19 @@ export default function AdminOverviewPage() {
   }, []);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-red-50/25 p-5 rounded-2xl">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">
+        <h1 className="text-2xl text-black font-bold tracking-tight">
           Admin Overview
         </h1>
 
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="mt-1 text-sm  text-muted-foreground">
           Monitor your PizzaHub platform from one place.
         </p>
       </div>
 
       {loading ? (
-        <div className="rounded-xl border p-8 text-center text-muted-foreground">
+        <div className="rounded-xl border p-8 text-center text-muted-foreground bg-red-50/25">
           Loading admin overview...
         </div>
       ) : error ? (

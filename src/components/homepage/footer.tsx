@@ -13,7 +13,7 @@ import {
 
 const Footer = () => {
   return (
-    <footer className="bg-[#250808] text-white">
+    <footer className="bg-[#250808] text-white mt-20">
       <div className="mx-auto max-w-7xl px-6 pt-16 pb-8">
 
         {/* Main Footer */}
