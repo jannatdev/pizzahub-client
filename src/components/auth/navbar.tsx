@@ -166,15 +166,18 @@ export function Navbar() {
                   </DropdownMenuItem>
 
                   
-
-                 
-                   <ProfileInfoDialog
+                <DropdownMenuItem>
+                      <ProfileInfoDialog
                       open={profileOpen}
                       onOpenChange={setProfileOpen}
                       name={user.name}
                       email={user.email}
                       image={user.image}
                     />
+
+                </DropdownMenuItem>
+                 
+               
                   
 
                   <DropdownMenuItem onClick={handleLogout}>
