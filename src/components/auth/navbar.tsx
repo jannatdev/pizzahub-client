@@ -179,8 +179,7 @@ export function Navbar() {
                       )
                     }
                   >
-                    <Settings className="size-4" />
-                    Profile Settings
+                   
                    <ProfileInfoDialog
                       name={user.name}
                       email={user.email}
