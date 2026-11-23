@@ -4,12 +4,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-import { authFetch } from "@/lib/auth-fetch";
 import { usePathname, useSearchParams } from "next/navigation";
 
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -19,6 +19,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 
 import { Calendar } from "lucide-react";
+import { authFetch } from "@/lib/api/auth-fetch";
 
 export interface OrderFormProps {
   menuId: string;
@@ -27,7 +28,7 @@ export interface OrderFormProps {
   itemImage: string;
 }
 
-export default function OrderForm({ menuId, vendorName, itemName, itemImage }: OrderFormProps) {
+export default function OrderForm({ menuId, vendorName, itemName}: OrderFormProps) {
   const [deliveryDate, setDeliveryDate] = useState<string>("");
   const [deliveryAddress, setDeliveryAddress] = useState<string>("");
   const [additionalMessage, setAdditionalMessage] = useState<string>("");
@@ -37,8 +38,7 @@ export default function OrderForm({ menuId, vendorName, itemName, itemImage }: O
   const params = useSearchParams?.() || new URLSearchParams();
 
   // Extract menuId from pathname or props
-  const effectiveMenuId = menuId || pathname.match/\/menu\/([^/]+)/?.[1];
-
+  const effectiveMenuId = menuId || pathname.match(/\/menu\/([^/]+)/)?.[1];
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -90,8 +90,7 @@ export default function OrderForm({ menuId, vendorName, itemName, itemImage }: O
           <CardDescription>
             Order {itemName} from {vendorName}
           </CardDescription>
-        </CardContent>
-
+         </CardHeader>
         <CardContent className="space-y-6">
           {/* Menu item hidden fields are detected automatically */}
           <Input
@@ -164,7 +163,7 @@ export default function OrderForm({ menuId, vendorName, itemName, itemImage }: O
               <>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  class="mr-2 h-4 w-4 animate-spin"
+                  className="mr-2 h-4 w-4 animate-spin"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"

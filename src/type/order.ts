@@ -27,7 +27,7 @@ export interface Order {
   customerName: string;
   customerEmail: string;
   itemName: string;
-  itemImage?: string;
+ imageUrl?: string;
   quantity: number;
   price: number;
   totalPrice: number;
@@ -35,6 +35,7 @@ export interface Order {
   deliveryAddress: string;
   additionalMessage?: string;
   status: OrderStatus;
+  vendorName?:string,
 }
 export interface VendorOrdersResponse {
   success: boolean;

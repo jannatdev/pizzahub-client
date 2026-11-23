@@ -1,12 +1,11 @@
-'use client';
 
-
+"use client";
 
 import ProfileUpdateForm from "@/components/card/profileUpdateform";
 import { useSession } from "@/lib/auth-client";
 
-export  function VendorProfilePage() {
- const { data: session, isPending } = useSession();
+export default function VendorProfilePage() {
+  const { data: session, isPending } = useSession();
 
   if (isPending) {
     return <p>Loading profile...</p>;
@@ -20,13 +19,15 @@ export  function VendorProfilePage() {
     name: session.user.name || "",
     email: session.user.email || "",
     image: session.user.image || "",
-    role: "customer" as const,
+    role: "vendor" as const,
   };
 
-  
-<ProfileUpdateForm
-  profile={profile}
-  userType="vendor"
-  endpoint="/vendor/profile"
-/> ;
+  return (
+    <ProfileUpdateForm
+      profile={profile}
+      userType="vendor"
+      endpoint="/vendor/profile"
+    />
+  );
 }
+

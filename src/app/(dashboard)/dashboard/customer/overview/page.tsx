@@ -366,7 +366,7 @@ useEffect(() => {
               </p>
             </div>
           ) : stats.total === 0 ? (
-            <div className="grid min-h-[250px] place-items-center text-center">
+            <div className="grid min-h-62.5 place-items-center text-center">
               <div>
                 <div className="mx-auto flex size-14 items-center justify-center rounded-full bg-red-50">
                   <ShoppingBag className="size-7 text-red-500" />
@@ -385,10 +385,10 @@ useEffect(() => {
             <div className="grid items-center gap-8 md:grid-cols-2">
 
               {/* Donut chart */}
-              <div className="relative mx-auto w-full max-w-[280px]">
+              <div className="relative mx-auto w-full max-w-70">
                 <ChartContainer
                   config={chartConfig}
-                  className="mx-auto aspect-square h-[260px]"
+                  className="mx-auto aspect-square h-65"
                 >
                   <PieChart>
                     <ChartTooltip
@@ -482,7 +482,7 @@ useEffect(() => {
 
           {/* Bottom information */}
           {!loading && !error && stats.total > 0 && (
-            <div className="mt-6 flex flex-col justify-between gap-2 rounded-xl bg-gradient-to-r from-red-50 to-orange-50 p-4 sm:flex-row sm:items-center">
+            <div className="mt-6 flex flex-col justify-between gap-2 rounded-xl bg-linear-to-r from-red-50 to-orange-50 p-4 sm:flex-row sm:items-center">
               <div>
                 <p className="text-sm font-semibold text-gray-800">
                   Your PizzaHub order summary

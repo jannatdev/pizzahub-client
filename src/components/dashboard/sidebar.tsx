@@ -534,7 +534,7 @@ export function DashboardSidebar({
       aria-label="Dashboard sidebar"
       className={cn(
         "fixed inset-y-0 left-0 z-40 hidden border-r bg-white transition-[width] duration-200 ease-out md:flex md:flex-col",
-        collapsed ? "w-[76px]" : "w-64"
+        collapsed ? "w-19" : "w-64"
       )}
     >
       <SidebarBody

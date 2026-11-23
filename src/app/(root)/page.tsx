@@ -17,17 +17,17 @@ export default async function Home() {
   const isLoggedIn = !!session?.user;
 
   // Frader Motion variants for homepage animations
-  const heroVariants = {
-    initial: { y: 20, opacity: 0 },
-    animate: { y: 0, opacity: 1 },
-    exit: { y: -20, opacity: 0 },
-  };
+  // const heroVariants = {
+  //   initial: { y: 20, opacity: 0 },
+  //   animate: { y: 0, opacity: 1 },
+  //   exit: { y: -20, opacity: 0 },
+  // };
 
-  const sectionVariants = {
-    initial: { y: 40, opacity: 0 },
-    animate: { y: 0, opacity: 1 },
-    exit: { y: 40, opacity: 0 },
-  };
+  // const sectionVariants = {
+  //   initial: { y: 40, opacity: 0 },
+  //   animate: { y: 0, opacity: 1 },
+  //   exit: { y: 40, opacity: 0 },
+  // };
 
   return (
     <main className="flex-1 flex flex-col bg-red-50/25">

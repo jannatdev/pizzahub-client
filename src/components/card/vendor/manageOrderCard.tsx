@@ -146,9 +146,9 @@ const statusStyles: Record<OrderStatus, string> = {
 
         <div className="flex items-center justify-between gap-10">
           <div className="relative h-24 w-full shrink-0 overflow-hidden rounded-lg bg-muted sm:w-28">
-          {order.itemImage ? (
+          {order.imageUrl ? (
             <Image
-              src={order.itemImage}
+              src={order.imageUrl}
               alt={order.itemName || "Menu item"}
               fill
               sizes="112px"

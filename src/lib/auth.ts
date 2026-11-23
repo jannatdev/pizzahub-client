@@ -3,8 +3,9 @@ import "server-only";
 import { betterAuth } from "better-auth";
 import { MongoClient } from "mongodb";
 import { mongodbAdapter } from "@better-auth/mongo-adapter";
-import { z } from "zod";
+
 import { jwt } from "better-auth/plugins";
+import { APIError, createAuthMiddleware } from "better-auth/api";
 
 
   
@@ -58,6 +59,34 @@ export const auth = betterAuth({
 
   emailAndPassword: {
     enabled: true,
+    // Spec: minimum 6 characters, one uppercase and one lowercase letter.
+    minPasswordLength: 6,
+  },
+
+  // Server-side password rules for public registration (sign-up only).
+  hooks: {
+    before: createAuthMiddleware(async (ctx) => {
+      if (ctx.path !== "/sign-up/email") return;
+
+      const password = ctx.body?.password as string | undefined;
+      if (typeof password !== "string") return;
+
+      if (password.length < 6) {
+        throw new APIError("BAD_REQUEST", {
+          message: "Password must be at least 6 characters long.",
+        });
+      }
+      if (!/[A-Z]/.test(password)) {
+        throw new APIError("BAD_REQUEST", {
+          message: "Password must contain at least one uppercase letter.",
+        });
+      }
+      if (!/[a-z]/.test(password)) {
+        throw new APIError("BAD_REQUEST", {
+          message: "Password must contain at least one lowercase letter.",
+        });
+      }
+    }),
   },
 
    socialProviders: {
@@ -73,7 +102,11 @@ export const auth = betterAuth({
       type: "string",
       required: false,
       defaultValue: "customer",
-      input: false,
+      // Sign-up must accept the chosen role (vendor / customer). The
+      // databaseHooks below force any other value (e.g. "admin") back to
+      // "customer", so admin accounts still cannot be created publicly, and
+      // role updates are blocked entirely.
+      input: true,
     },
     businessName: {
       type: "string",

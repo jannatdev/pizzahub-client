@@ -19,7 +19,19 @@ const apiRequest = async <T>(
 
   return data as T;
 };
-
+export const updateMenuAvailability = async (
+  id: string,
+  isActive: boolean
+) => {
+  return apiRequest<{
+    success: boolean;
+    message: string;
+    data?: MenuItem;
+  }>(`/api/vendor/menus/${id}/availability`, {
+    method: "PATCH",
+    body: JSON.stringify({ isActive }),
+  });
+};
 // 1. Get all vendor menu items
 export const getMyMenuItems = async (
   status?: string
@@ -54,16 +66,20 @@ export const deleteMyMenuItem = async (id: string) => {
 };
 
 // 4. Update menu availability
-export const updateMenuAvailability = async (
+export const updateMyMenuItem = async (
   id: string,
-  isActive: boolean
+  updateData: Partial<
+    Pick<
+      MenuItem,
+      "itemName" | "category" | "description" | "price" | "location" | "imageUrl"
+    >
+  >
 ) => {
   return apiRequest<{
     success: boolean;
     message: string;
-    data?: MenuItem;
-  }>(`/api/vendor/menus/${id}/availability`, {
+  }>(`/api/vendor/menus/${id}`, {
     method: "PATCH",
-    body: JSON.stringify({ isActive }),
+    body: JSON.stringify(updateData),
   });
 };

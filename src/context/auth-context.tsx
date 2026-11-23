@@ -1,6 +1,6 @@
 "use client";
 
-import { AuthUser } from "@/type/auth";
+import type { AuthUser } from "@/type/auth";
 import { createContext, useContext, useState, type ReactNode } from "react";
 
 /**
@@ -47,3 +47,4 @@ export function useAuth(): AuthContextValue {
   }
   return context;
 }
+export type { AuthUser } from "@/type/auth";

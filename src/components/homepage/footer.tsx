@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+
 import {
   FaPizzaSlice,
   FaFacebookF,
@@ -12,6 +13,8 @@ import {
 } from "react-icons/fa";
 
 const Footer = () => {
+
+   
   return (
     <footer className="bg-[#250808] text-white mt-20">
       <div className="mx-auto max-w-7xl px-6 pt-16 pb-8">
@@ -151,7 +154,7 @@ const Footer = () => {
         <div className="mt-14 border-t border-gray-800 pt-7">
           <div className="flex flex-col items-center justify-between gap-4 text-center sm:flex-row sm:text-left">
             <p className="text-sm text-gray-500">
-              © {new Date().getFullYear()} PizzaHub. All rights reserved.
+              © 2026 PizzaHub. All rights reserved.
             </p>
 
             <p className="text-sm text-gray-500">

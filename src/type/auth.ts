@@ -5,5 +5,6 @@ export interface AuthUser {
   email: string;
   image: string;
   role: UserRole;
-  businessName?:string
+  businessName?: string;
+  isPremium?: boolean;
 }

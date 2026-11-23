@@ -2,12 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-
 import {
   getMyMenuItems,
-  deleteMyMenuItem,
   updateMenuAvailability,
+  deleteMyMenuItem,
 } from "@/lib/api/vendor/vendorMenu";
+
 
 import type { MenuItem } from "@/type/menu";
 

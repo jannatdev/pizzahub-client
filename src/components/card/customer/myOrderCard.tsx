@@ -51,6 +51,8 @@ const statusStyles: Record<OrderStatus, string> = {
   Accepted: "bg-green-100 text-green-700 border-green-200",
   Rejected: "bg-red-100 text-red-700 border-red-200",
   Cancelled: "bg-gray-100 text-gray-600 border-gray-200",
+  Delivered: "bg-green-100 text-green-700",
+  
 };
 
 const statusDot: Record<OrderStatus, string> = {
@@ -58,6 +60,7 @@ const statusDot: Record<OrderStatus, string> = {
   Accepted: "bg-green-500",
   Rejected: "bg-red-500",
   Cancelled: "bg-gray-400",
+  Delivered: "bg-green-500",
 };
 
 const formatDate = (value?: string) =>
