@@ -1,6 +1,7 @@
 
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Star,
@@ -8,30 +9,21 @@ import {
   ChevronLeft,
   ChevronRight,
   Pizza,
-  Truck,
+  ArrowUpRight,
 } from "lucide-react";
 
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
   type CarouselApi,
 } from "@/components/ui/carousel";
-
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
 
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar";
-
-import { useEffect, useState } from "react";
 
 const testimonials = [
   {
@@ -91,23 +83,6 @@ const testimonials = [
   },
 ];
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.15 },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 25 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6 },
-  },
-};
-
 export default function TestimonialsSection() {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
@@ -115,9 +90,10 @@ export default function TestimonialsSection() {
   useEffect(() => {
     if (!api) return;
 
-    const update = () => setCurrent(api.selectedScrollSnap());
+    const update = () => {
+      setCurrent(api.selectedScrollSnap());
+    };
 
-    update();
     api.on("select", update);
 
     return () => {
@@ -127,189 +103,233 @@ export default function TestimonialsSection() {
 
   return (
     <section className="relative overflow-hidden bg-[#fff8f2] py-20 md:py-28">
+
       {/* Decorative Background */}
-      <div className="absolute -left-32 top-20 h-72 w-72 rounded-full bg-orange-200/30 blur-3xl" />
-      <div className="absolute -right-32 bottom-0 h-80 w-80 rounded-full bg-red-200/20 blur-3xl" />
+      <div className="absolute -left-40 top-20 h-96 w-96 rounded-full bg-orange-200/30 blur-[100px]" />
+      <div className="absolute -right-40 bottom-10 h-96 w-96 rounded-full bg-red-200/30 blur-[100px]" />
 
       <div className="container relative mx-auto px-4">
 
-        {/* Section Heading */}
+        {/* Heading */}
         <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
-          className="mx-auto mb-14 max-w-2xl text-center"
+          initial={{ opacity: 0, y: 25 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="mx-auto mb-16 max-w-3xl text-center"
         >
-          <motion.div
-            variants={itemVariants}
-            className="mb-5 inline-flex items-center gap-2 rounded-full border border-orange-200 bg-white px-4 py-2 text-sm font-semibold text-[#f15a24]"
-          >
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-orange-200 bg-white px-5 py-2 text-xs font-bold uppercase tracking-[0.2em] text-[#d94b20] shadow-sm">
             <Star className="h-4 w-4 fill-current" />
-            Customer Love
-          </motion.div>
+            The PizzaHub Experience
+          </div>
 
-          <motion.h2
-            variants={itemVariants}
-            className="text-3xl font-extrabold tracking-tight text-gray-950 sm:text-4xl md:text-5xl"
-          >
-            {`Don't`} Just Take Our Word.
-            <span className="block text-[#f15a24]">
-              Hear It From Our Customers.
+          <h2 className="text-4xl font-black leading-tight tracking-tight text-[#250808] sm:text-5xl md:text-6xl">
+            Stories That
+            <span className="block text-[#e34b27]">
+              Make Us Smile.
             </span>
-          </motion.h2>
+          </h2>
 
-          <motion.p
-            variants={itemVariants}
-            className="mt-5 text-base leading-7 text-gray-600 md:text-lg"
-          >
-            From the first bite to the last slice, discover why pizza lovers
-            choose PizzaHub for their favorite flavors and a better
-            food delivery experience.
-          </motion.p>
+          <p className="mx-auto mt-6 max-w-xl text-base leading-8 text-gray-500 md:text-lg">
+            Real experiences, happy customers, and unforgettable
+            flavors. `Here&apos;s` what our pizza lovers have to say.
+          </p>
         </motion.div>
 
-        {/* Testimonial Carousel */}
-        <Carousel
-          setApi={setApi}
-          opts={{
-            align: "center",
-            loop: true,
-          }}
-          className="mx-auto max-w-5xl"
-        >
-          <CarouselContent className="-ml-4 py-5">
-            {testimonials.map((testimonial, index) => (
-              <CarouselItem
-                key={testimonial.name}
-                className="pl-4 md:basis-1/2 lg:basis-1/2"
-              >
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.08 }}
-                  className="h-full"
-                >
-                  <Card className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-orange-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-orange-300 hover:shadow-xl">
-                    <CardContent className="flex flex-1 flex-col p-7 md:p-8">
+        {/* Carousel */}
+        <div className="relative mx-auto max-w-5xl">
 
-                      {/* Quote Icon & Rating */}
-                      <div className="mb-6 flex items-center justify-between">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-50 text-[#f15a24]">
-                          <Quote className="h-6 w-6 fill-current" />
+          <Carousel
+            setApi={setApi}
+            opts={{
+              align: "center",
+              loop: true,
+            }}
+            className="w-full"
+          >
+            <CarouselContent className="-ml-5 py-5">
+
+              {testimonials.map((testimonial, index) => (
+                <CarouselItem
+                  key={testimonial.name}
+                  className="basis-[90%] pl-5 sm:basis-[80%] lg:basis-[76%]"
+                >
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.96 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5 }}
+                    className="h-full"
+                  >
+                    <div className="group relative flex h-full min-h-[390px] flex-col overflow-hidden rounded-[30px] bg-gradient-to-br from-[#390d0d] via-[#250808] to-[#160505] p-7 text-white shadow-[0_25px_70px_-25px_rgba(37,8,8,0.4)] sm:p-10 md:p-12">
+
+                      {/* Decorative shapes */}
+                      <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full border-[35px] border-white/[0.035]" />
+
+                      <div className="pointer-events-none absolute -bottom-24 -left-16 h-64 w-64 rounded-full bg-red-600/10 blur-3xl" />
+
+                      {/* Top Row */}
+                      <div className="relative z-10 flex items-center justify-between">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#e34b27] shadow-lg shadow-red-950/30">
+                          <Quote className="h-6 w-6 fill-white text-white" />
                         </div>
 
-                        <div className="flex items-center gap-1">
-                          {Array.from({ length: testimonial.rating }).map(
-                            (_, i) => (
-                              <Star
-                                key={i}
-                                className="h-4 w-4 fill-[#ffae00] text-orange-700"
-                              />
-                            )
-                          )}
+                        <div className="flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.07] px-4 py-2">
+                          {Array.from({
+                            length: testimonial.rating,
+                          }).map((_, i) => (
+                            <Star
+                              key={i}
+                              className="h-4 w-4 fill-[#ffb52e] text-[#ffb52e]"
+                            />
+                          ))}
+                          <span className="ml-2 text-xs font-bold text-white/80">
+                            {testimonial.rating}.0
+                          </span>
                         </div>
                       </div>
-
-                      {/* Highlight */}
-                      <h3 className="mb-4 text-xl font-bold text-gray-900">
-                        &ldquo;{testimonial.highlight}&rdquo;
-                      </h3>
 
                       {/* Review */}
-                      <p className="flex-1 text-[15px] leading-7 text-gray-600">
-                        {testimonial.review}
-                      </p>
+                      <div className="relative z-10 my-auto py-8">
+                        <p className="mb-4 text-xs font-bold uppercase tracking-[0.22em] text-[#ff9875]">
+                          {testimonial.highlight}
+                        </p>
 
-                      {/* Ordered Item */}
-                      <div className="my-6 flex items-center gap-2 rounded-xl bg-[#fff8f2] px-4 py-3">
-                        <Pizza className="h-5 w-5 text-[#f15a24]" />
-                        <span className="text-sm text-gray-500">
-                          Loved ordering:
-                        </span>
-                        <span className="text-sm font-semibold text-gray-900">
-                          {testimonial.order}
-                        </span>
+                        <h3 className="max-w-2xl text-2xl font-semibold leading-relaxed tracking-tight text-white sm:text-3xl md:text-[34px]">
+                         &ldquo;{testimonial.review}&rdquo;
+                        </h3>
                       </div>
 
-                      {/* Customer Info */}
-                      <div className="flex items-center gap-3 border-t border-gray-100 pt-5">
-                        <Avatar className="h-12 w-12 border-2 border-red-600">
-                          <AvatarImage
-                            src={testimonial.image}
-                            alt={testimonial.name}
-                          />
-                          <AvatarFallback>
-                            {testimonial.name.slice(0, 2)}
-                          </AvatarFallback>
-                        </Avatar>
+                      {/* Bottom */}
+                      <div className="relative z-10 flex flex-col justify-between gap-5 border-t border-white/10 pt-6 sm:flex-row sm:items-center">
 
-                        <div className="min-w-0 flex-1">
-                          <h4 className="font-bold text-gray-900">
-                            {testimonial.name}
-                          </h4>
-                          <p className="text-xs text-gray-500">
-                            {testimonial.location}
-                          </p>
+                        {/* Customer */}
+                        <div className="flex items-center gap-4">
+                          <Avatar className="h-14 w-14 border-2 border-[#e34b27]">
+                            <AvatarImage
+                              src={testimonial.image}
+                              alt={testimonial.name}
+                            />
+                            <AvatarFallback className="bg-red-100 font-bold text-red-700">
+                              {testimonial.name.slice(0, 2)}
+                            </AvatarFallback>
+                          </Avatar>
+
+                          <div>
+                            <h4 className="font-bold text-white">
+                              {testimonial.name}
+                            </h4>
+
+                            <p className="mt-1 text-xs text-white/50">
+                              {testimonial.location}
+                            </p>
+                          </div>
                         </div>
 
-                        <div className="flex items-center gap-1 rounded-full bg-green-50 px-3 py-1.5 text-xs font-semibold text-green-700">
-                          <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
-                          Customer
+                        {/* Ordered Pizza */}
+                        <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#e34b27]/20 text-[#ff9875]">
+                            <Pizza className="h-5 w-5" />
+                          </div>
+
+                          <div>
+                            <p className="text-[10px] font-semibold uppercase tracking-wider text-white/40">
+                              Loved ordering
+                            </p>
+                            <p className="mt-1 text-sm font-semibold text-white">
+                              {testimonial.order}
+                            </p>
+                          </div>
                         </div>
+
                       </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
+
+                      {/* Card number */}
+                      <span className="pointer-events-none absolute right-8 top-28 text-7xl font-black text-white/[0.035] sm:text-8xl">
+                        0{index + 1}
+                      </span>
+                    </div>
+                  </motion.div>
+                </CarouselItem>
+              ))}
+
+            </CarouselContent>
+          </Carousel>
 
           {/* Navigation */}
-          <div className="mt-8 flex items-center justify-center gap-5">
-            <CarouselPrevious className="static h-11 w-11 translate-y-0 rounded-full border-orange-200 bg-white text-[#f15a24] hover:bg-[#f15a24] hover:text-white" />
+          <div className="mt-9 flex items-center justify-center gap-6">
 
-            {/* Pagination Dots */}
+            <button
+              type="button"
+              onClick={() => api?.scrollPrev()}
+              aria-label="Previous testimonial"
+              className="flex h-12 w-12 items-center justify-center rounded-full border border-orange-200 bg-white text-[#250808] shadow-sm transition-all hover:border-[#e34b27] hover:bg-[#e34b27] hover:text-white"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+
+            {/* Pagination */}
             <div className="flex items-center gap-2">
-              {testimonials.map((_, index) => (
+              {testimonials.map((item, index) => (
                 <button
-                  key={index}
+                  key={item.name}
+                  type="button"
                   onClick={() => api?.scrollTo(index)}
                   aria-label={`Go to testimonial ${index + 1}`}
-                  className={`h-2.5 rounded-full transition-all duration-300 ${
+                  aria-current={current === index ? "true" : undefined}
+                  className={`h-2 rounded-full transition-all duration-300 ${
                     current === index
-                      ? "w-8 bg-[#f15a24]"
+                      ? "w-9 bg-[#e34b27]"
                       : "w-2.5 bg-orange-200 hover:bg-orange-400"
                   }`}
                 />
               ))}
             </div>
 
-            <CarouselNext className="static h-11 w-11 translate-y-0 rounded-full border-orange-200 bg-white text-[#f15a24] hover:bg-[#f15a24] hover:text-white" />
-          </div>
-        </Carousel>
+            <button
+              type="button"
+              onClick={() => api?.scrollNext()}
+              aria-label="Next testimonial"
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-[#e34b27] text-white shadow-lg shadow-red-200 transition-all hover:scale-105 hover:bg-[#c83b1b]"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
 
-        {/* Bottom Trust Section */}
+          </div>
+
+          {/* Slide counter */}
+          <p className="mt-5 text-center text-xs font-semibold tracking-widest text-gray-400">
+            TESTIMONIAL {String(current + 1).padStart(2, "0")} /{" "}
+            {String(testimonials.length).padStart(2, "0")}
+          </p>
+        </div>
+
+        {/* Bottom Trust Banner */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="mx-auto mt-16 flex max-w-2xl flex-col items-center justify-center gap-4 rounded-2xl border border-orange-100 bg-white p-6 text-center shadow-sm sm:flex-row sm:text-left"
+          className="mx-auto mt-20 flex max-w-3xl flex-col items-center justify-between gap-5 rounded-3xl border border-orange-100 bg-white p-6 shadow-sm sm:flex-row sm:p-8"
         >
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-orange-700 text-white">
-            <Truck className="h-7 w-7" />
+          <div className="flex items-center gap-4">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#fff0e9] text-[#e34b27]">
+              <Pizza className="h-7 w-7" />
+            </div>
+
+            <div>
+              <h3 className="text-lg font-extrabold text-[#250808]">
+                Good food. Happy moments.
+              </h3>
+              <p className="mt-1 text-sm text-gray-500">
+                Made with love, delivered with care.
+              </p>
+            </div>
           </div>
 
-          <div>
-            <h3 className="text-lg font-bold text-gray-900">
-              Great pizza. Great experience.
-            </h3>
-            <p className="mt-1 text-sm text-gray-500">
-              Every PizzaHub order is an opportunity to make your day
-              a little more delicious.
-            </p>
+          <div className="flex items-center gap-2 rounded-full bg-[#fff5ee] px-5 py-3 text-sm font-bold text-[#e34b27]">
+            Made for pizza lovers
+            <ArrowUpRight className="h-4 w-4" />
           </div>
         </motion.div>
 
