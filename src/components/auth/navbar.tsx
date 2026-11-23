@@ -122,7 +122,7 @@ const handleProfile = () => {
   return (
     <>
       <div className="sticky top-0 z-50 w-full border-b bg-white">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-10 px-4 sm:px-6 lg:px-8">
 
           {/* Logo */}
           <Link href="/" className="flex shrink-0 items-center gap-2">
