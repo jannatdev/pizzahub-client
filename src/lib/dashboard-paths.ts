@@ -10,7 +10,7 @@ import type { UserRole } from "@/context/auth-context";
 export const DASHBOARD_HOME: Record<UserRole, string> = {
  
   admin: "/dashboard/admin/overview",
-  vendor: "/dashboard/vendor",
+  vendor: "/dashboard/vendor/overview",
   customer: "/dashboard/customer",
 
 };

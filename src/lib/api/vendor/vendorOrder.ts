@@ -1,24 +1,15 @@
-
 import type { VendorOrdersResponse } from "@/type/order";
 import { authFetch } from "@/lib/api/auth-fetch";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
 // GET: Fetch vendor orders
 export const getVendorOrders = async (): Promise<VendorOrdersResponse> => {
-  const response = await authFetch(`${API_URL}/vendor/orders`, {
+  const result = await authFetch("/api/vendor/orders", {
     method: "GET",
     credentials: "include",
     cache: "no-store",
   });
 
-  const result = await response.json();
-
-  if (!response.ok) {
-    throw new Error(result.message || "Failed to fetch vendor orders.");
-  }
-
-  return result;
+  return result as VendorOrdersResponse;
 };
 
 // PATCH: Accept or Reject an order
@@ -26,23 +17,14 @@ export const updateVendorOrderStatus = async (
   id: string,
   status: "Accepted" | "Rejected"
 ) => {
-  const response = await authFetch(
-    `${API_URL}/vendor/orders/${id}/status`,
-    {
-      method: "PATCH",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ status }),
-    }
-  );
-
-  const result = await response.json();
-
-  if (!response.ok) {
-    throw new Error(result.message || "Failed to update order status.");
-  }
+  const result = await authFetch(`/api/vendor/orders/${id}/status`, {
+    method: "PATCH",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ status }),
+  });
 
   return result;
 };

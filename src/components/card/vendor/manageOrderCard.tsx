@@ -48,12 +48,14 @@ interface VendorOrderCardProps {
   ) => void;
 }
 
+
 export default function ManageOrderCard({
   order,
   onStatusUpdate,
 }: VendorOrderCardProps) {
   const [updating, setUpdating] = useState(false);
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+
 
   const isPending = order.status === "Pending";
 
@@ -82,13 +84,12 @@ export default function ManageOrderCard({
       setUpdating(false);
     }
   };
-
-  const statusStyles: Record<OrderStatus, string> = {
-    Pending: "bg-amber-100 text-amber-700 border-amber-200",
-    Accepted: "bg-green-100 text-green-700 border-green-200",
-    Rejected: "bg-red-100 text-red-700 border-red-200",
-    Cancelled: "bg-gray-100 text-gray-700 border-gray-200",
-  };
+const statusStyles: Record<OrderStatus, string> = {
+  Pending: "bg-yellow-100 text-yellow-700",
+  Accepted: "bg-green-100 text-green-700",
+  Rejected: "bg-red-100 text-red-700",
+  Delivered: "bg-blue-100 text-blue-700",
+};
 
   return (
     <>
@@ -141,24 +142,26 @@ export default function ManageOrderCard({
           <Separator />
 
           {/* Item Information */}
-          <div className="flex flex-col gap-4 sm:flex-row">
-            <div className="relative h-24 w-full shrink-0 overflow-hidden rounded-lg bg-muted sm:w-28">
-              {order.itemImage ? (
-                <Image
-                  src={order.itemImage}
-                  alt={order.itemName}
-                  fill
-                  sizes="112px"
-                  className="object-cover"
-                />
-              ) : (
-                <div className="flex h-full items-center justify-center">
-                  <Package className="h-8 w-8 text-muted-foreground" />
-                </div>
-              )}
-            </div>
 
-            <div className="flex-1 space-y-2">
+        <div className="flex items-center justify-between gap-10">
+          <div className="relative h-24 w-full shrink-0 overflow-hidden rounded-lg bg-muted sm:w-28">
+          {order.itemImage ? (
+            <Image
+              src={order.itemImage}
+              alt={order.itemName || "Menu item"}
+              fill
+              sizes="112px"
+              className="object-cover"
+              unoptimized
+            />
+          ) : (
+            <div className="flex h-full items-center justify-center">
+              <Package className="h-8 w-8 text-muted-foreground" />
+            </div>
+          )}
+        </div>
+
+         <div className="flex-1 space-y-2">
               <h3 className="font-semibold">{order.itemName}</h3>
 
               <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">
@@ -169,8 +172,11 @@ export default function ManageOrderCard({
               <p className="text-lg font-bold text-red-600">
                 Total: ৳{order.totalPrice}
               </p>
-            </div>
-          </div>
+        </div>
+         
+
+        </div>
+        
 
           <Separator />
 

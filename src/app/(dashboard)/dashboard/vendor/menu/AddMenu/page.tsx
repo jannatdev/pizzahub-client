@@ -3,7 +3,7 @@ import React from 'react';
 
 const AddMenu = () => {
     return (
-       <div className="mx-auto w-full max-w-4xl">
+       <div className="mx-auto w-full max-w-4xl bg-red-50/20">
       <div className="mb-6">
         <h1 className="text-2xl font-bold tracking-tight text-gray-900">
           Add Menu Item

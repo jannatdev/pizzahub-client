@@ -4,7 +4,8 @@ export type OrderStatus =
   | "Pending"
   | "Accepted"
   | "Rejected"
-  | "Cancelled";
+  | "Delivered";
+
 
 /**
  * Envelope every backend endpoint answers with (`{ success, message, ... }`).
@@ -20,36 +21,21 @@ export interface ApiResponse<T = unknown> {
 
 export interface Order {
   _id: string;
-  menuId: string;
+  status: "Pending" | "Accepted" | "Rejected" | "Delivered";
+  createdAt: string;
 
-  customerId: string;
   customerName: string;
   customerEmail: string;
 
-  vendorId: string;
-  vendorName: string;
-  vendorEmail: string;
-
   itemName: string;
-  imageUrl: string;
-
-  price: number;
+  itemImage?: string; // Add this
   quantity: number;
+  price: number;
   totalPrice: number;
 
   deliveryDate: string;
   deliveryAddress: string;
-
-  status: OrderStatus;
-  /**
-   * Free-text note the customer added at checkout. The backend stores it as
-   * `additionalMessage` (see pizzahub-server order controller), so the client
-   * must use the same name or the value silently reads as undefined.
-   */
   additionalMessage?: string;
-
-  createdAt: string;
-  updatedAt: string;
 }
 
 export interface VendorOrdersResponse {

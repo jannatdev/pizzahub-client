@@ -35,27 +35,24 @@ const ManageMenuPage = () => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
 
-//   const fetchItems = async () => {
-//     try {
-//       const result = await getMyMenuItems();
-//       setItems(result.data);
-//     } catch (error) {
-//       toast.error(
-//         error instanceof Error
-//           ? error.message
-//           : "Failed to load menu items"
-//       );
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
+
+
 
  useEffect(() => {
   let ignore = false;
 
   const loadItems = async () => {
     try {
+      console.log("Loading vendor menu items...");
       const result = await getMyMenuItems();
+     
+
+console.log("VENDOR MENU API RESULT:", result);
+console.log("VENDOR MENU DATA:", result?.data);
+
+if (!ignore) {
+  setItems(result?.data ?? []);
+}
 
       if (!ignore) {
         setItems(result.data);
@@ -157,7 +154,7 @@ const ManageMenuPage = () => {
   }
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 bg-red-50/20">
       {/* Page Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">

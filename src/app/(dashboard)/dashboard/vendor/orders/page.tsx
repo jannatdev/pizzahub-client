@@ -12,14 +12,7 @@ import { AlertCircle, Package, RefreshCw } from "lucide-react";
 import ManageOrderCard from "@/components/card/vendor/manageOrderCard";
 import { getVendorOrders } from "@/lib/api/vendor/vendorOrder";
 
-/**
- * Vendor "Customer Orders" page.
- *
- * Loads GET /vendor/orders once on mount. `loading` always resolves (success,
- * empty or failure) so the page can never sit behind the skeleton forever, and
- * a failed read is rendered as a retryable error card instead of an unhandled
- * promise rejection.
- */
+
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,8 +23,7 @@ export default function OrdersPage() {
   useEffect(() => {
     let active = true;
 
-    // Every setState happens after the await, so the effect body itself never
-    // sets state synchronously — the skeleton shows for exactly one paint.
+   
     (async () => {
       try {
         const result = await getVendorOrders();

@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -17,6 +18,7 @@ import {
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
 import {
   Sheet,
   SheetContent,
@@ -24,19 +26,22 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import type { AuthUser, UserRole } from "@/context/auth-context";
+
+import type { UserRole } from "@/context/auth-context";
 import { DASHBOARD_HOME } from "@/lib/dashboard-paths";
 import { PremiumBadge } from "@/components/premium-badge";
 import { cn } from "@/lib/utils";
+import type { AuthUser } from "@/type/auth";
 
 /* -------------------------------------------------------------------------- */
-/*                              Role-based navigation                          */
+/*                              Role-based navigation                         */
 /* -------------------------------------------------------------------------- */
 
 export interface NavItem {
@@ -50,25 +55,36 @@ export interface NavSection {
   items: NavItem[];
 }
 
-
 export const navigation: Record<UserRole, NavSection[]> = {
   customer: [
     {
       title: "Overview",
       items: [
-        { label: "Overview", href: DASHBOARD_HOME.customer, icon: LayoutDashboard },
+        {
+          label: "Overview",
+          href: DASHBOARD_HOME.customer,
+          icon: LayoutDashboard,
+        },
       ],
     },
     {
       title: "Orders",
       items: [
-        { label: "My Orders", href: "/dashboard/customer/orders", icon: ShoppingBag },
+        {
+          label: "My Orders",
+          href: "/dashboard/customer/orders",
+          icon: ShoppingBag,
+        },
       ],
     },
     {
       title: "Account",
       items: [
-        { label: "Profile Settings", href: "/dashboard/customer/profile", icon: Settings },
+        {
+          label: "Profile Settings",
+          href: "/dashboard/customer/profile",
+          icon: Settings,
+        },
       ],
     },
   ],
@@ -77,27 +93,51 @@ export const navigation: Record<UserRole, NavSection[]> = {
     {
       title: "Overview",
       items: [
-        { label: "Overview", href:DASHBOARD_HOME.vendor, icon: LayoutDashboard },
+        {
+          label: "Overview",
+          href: DASHBOARD_HOME.vendor,
+          icon: LayoutDashboard,
+        },
       ],
     },
     {
       title: "Menu Management",
       items: [
-        { label: "My Menu Items", href: "/dashboard/vendor/menu/ManageMenu", icon: Utensils },
-        { label: "Add Menu Item", href: "/dashboard/vendor/menu/AddMenu", icon: PlusCircle },
+        {
+          label: "My Menu Items",
+          href: "/dashboard/vendor/menu/ManageMenu",
+          icon: Utensils,
+        },
+        {
+          label: "Add Menu Item",
+          href: "/dashboard/vendor/menu/AddMenu",
+          icon: PlusCircle,
+        },
       ],
     },
     {
       title: "Orders",
       items: [
-        { label: "Customer Orders", href: "/dashboard/vendor/orders", icon: ShoppingBag },
+        {
+          label: "Customer Orders",
+          href: "/dashboard/vendor/orders",
+          icon: ShoppingBag,
+        },
       ],
     },
     {
       title: "Account",
       items: [
-        { label: "Subscription", href: "/dashboard/vendor/subscription", icon: CreditCard },
-        { label: "Profile Settings", href: "/dashboard/vendor/profile", icon: Settings },
+        {
+          label: "Subscription",
+          href: "/dashboard/vendor/subscription",
+          icon: CreditCard,
+        },
+        {
+          label: "Profile Settings",
+          href: "/dashboard/vendor/profile",
+          icon: Settings,
+        },
       ],
     },
   ],
@@ -106,36 +146,55 @@ export const navigation: Record<UserRole, NavSection[]> = {
     {
       title: "Overview",
       items: [
-        { label: "Overview", href: DASHBOARD_HOME.admin , icon: LayoutDashboard },
+        {
+          label: "Overview",
+          href: DASHBOARD_HOME.admin,
+          icon: LayoutDashboard,
+        },
       ],
     },
     {
       title: "Management",
       items: [
-        { label: "Manage Users", href: "/dashboard/admin/users", icon: Users },
-        { label: "Manage Menu Items", href: "/dashboard/admin/menu", icon: Utensils },
+        {
+          label: "Manage Users",
+          href: "/dashboard/admin/users",
+          icon: Users,
+        },
+        {
+          label: "Manage Menu Items",
+          href: "/dashboard/admin/menu",
+          icon: Utensils,
+        },
       ],
     },
     {
       title: "Financial",
       items: [
-        { label: "Transactions", href: "/dashboard/admin/transactions", icon: Receipt },
+        {
+          label: "Transactions",
+          href: "/dashboard/admin/transactions",
+          icon: Receipt,
+        },
       ],
     },
     {
       title: "Account",
       items: [
-        { label: "Profile Settings", href: "/dashboard/admin/profile", icon: Settings },
+        {
+          label: "Profile Settings",
+          href: "/dashboard/admin/profile",
+          icon: Settings,
+        },
       ],
     },
   ],
 };
 
-/**
- * Page title + section for the dashboard header, based on the current URL.
- * Exact matches win; otherwise the closest parent link is used so future
- * detail pages (e.g. /dashboard/vendor/menu/123) still get a sensible title.
- */
+/* -------------------------------------------------------------------------- */
+/*                              Page information                              */
+/* -------------------------------------------------------------------------- */
+
 export function getPageInfo(
   pathname: string,
   role: UserRole
@@ -145,34 +204,49 @@ export function getPageInfo(
   for (const section of sections) {
     for (const item of section.items) {
       if (pathname === item.href) {
-        return { title: item.label, section: section.title };
+        return {
+          title: item.label,
+          section: section.title,
+        };
       }
     }
   }
 
-  let closest: { item: NavItem; section: NavSection } | null = null;
+  let closest: {
+    item: NavItem;
+    section: NavSection;
+  } | null = null;
 
   for (const section of sections) {
     for (const item of section.items) {
       const isParent = pathname.startsWith(`${item.href}/`);
-      if (isParent && (!closest || item.href.length > closest.item.href.length)) {
+
+      if (
+        isParent &&
+        (!closest || item.href.length > closest.item.href.length)
+      ) {
         closest = { item, section };
       }
     }
   }
 
   if (closest) {
-    return { title: closest.item.label, section: closest.section.title };
+    return {
+      title: closest.item.label,
+      section: closest.section.title,
+    };
   }
 
-  return { title: "Dashboard", section: null };
+  return {
+    title: "Dashboard",
+    section: null,
+  };
 }
 
 /* -------------------------------------------------------------------------- */
 /*                                  Helpers                                    */
 /* -------------------------------------------------------------------------- */
 
-/** "Jannatul Ferdous" → "JF" (used when a user has no profile image). */
 function getInitials(name: string): string {
   return name
     .split(" ")
@@ -188,7 +262,7 @@ function roleLabel(role: UserRole): string {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                             Shared sidebar pieces                           */
+/*                             Sidebar brand                                   */
 /* -------------------------------------------------------------------------- */
 
 function SidebarBrand({ showText }: { showText: boolean }) {
@@ -196,7 +270,7 @@ function SidebarBrand({ showText }: { showText: boolean }) {
     <Link
       href="/"
       className={cn(
-        "flex h-16 shrink-0 items-center bg-red-50/25 gap-2.5 px-4",
+        "flex h-16 shrink-0 items-center gap-2.5 bg-red-50/25 px-4",
         !showText && "justify-center px-0"
       )}
     >
@@ -211,31 +285,50 @@ function SidebarBrand({ showText }: { showText: boolean }) {
         </span>
       )}
 
-      {!showText && <span className="sr-only">PizzaHub home</span>}
+      {!showText && (
+        <span className="sr-only">PizzaHub home</span>
+      )}
     </Link>
   );
 }
 
-function SidebarProfile({ user, showText }: { user: AuthUser; showText: boolean }) {
+/* -------------------------------------------------------------------------- */
+/*                             Sidebar profile                                 */
+/* -------------------------------------------------------------------------- */
+
+function SidebarProfile({
+  user,
+  showText,
+  isPremium,
+}: {
+  user: AuthUser;
+  showText: boolean;
+  isPremium: boolean;
+}) {
   const avatar = (
     <Avatar className="size-9 shrink-0">
-      {user.image ? <AvatarImage src={user.image} alt={user.name} /> : null}
+      {user.image ? (
+        <AvatarImage src={user.image} alt={user.name} />
+      ) : null}
+
       <AvatarFallback className="bg-red-100 text-sm font-semibold text-red-700">
         {getInitials(user.name)}
       </AvatarFallback>
     </Avatar>
   );
 
-  // Collapsed sidebar: keep the avatar visible, hide the text.
   if (!showText) {
     return (
       <Tooltip>
-        <TooltipTrigger render={<span className="flex justify-center" />}>
+        <TooltipTrigger
+          render={<span className="flex justify-center" />}
+        >
           {avatar}
         </TooltipTrigger>
+
         <TooltipContent side="right">
           {user.name} · {roleLabel(user.role)}
-          {user.isPremium ? " · Premium" : ""}
+          {isPremium ? " · Premium" : ""}
         </TooltipContent>
       </Tooltip>
     );
@@ -246,17 +339,25 @@ function SidebarProfile({ user, showText }: { user: AuthUser; showText: boolean 
       {avatar}
 
       <div className="min-w-0">
-        <p className="truncate text-sm font-semibold text-gray-900">{user.name}</p>
+        <p className="truncate text-sm font-semibold text-gray-900">
+          {user.name}
+        </p>
+
         <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
           <span className="inline-flex w-fit rounded-full bg-red-50 px-2 py-0.5 text-[11px] font-semibold text-red-600">
             {roleLabel(user.role)}
           </span>
-          {user.isPremium && <PremiumBadge />}
+
+          {isPremium && <PremiumBadge />}
         </div>
       </div>
     </div>
   );
 }
+
+/* -------------------------------------------------------------------------- */
+/*                             Sidebar link                                    */
+/* -------------------------------------------------------------------------- */
 
 function SidebarLink({
   item,
@@ -287,6 +388,7 @@ function SidebarLink({
             : "text-gray-400 group-hover:text-gray-600"
         )}
       />
+
       {collapsed ? (
         <span className="sr-only">{item.label}</span>
       ) : (
@@ -295,7 +397,6 @@ function SidebarLink({
     </>
   );
 
-  // Collapsed: icon only, label shown in a tooltip on hover.
   if (collapsed) {
     return (
       <Tooltip>
@@ -311,7 +412,10 @@ function SidebarLink({
         >
           {content}
         </TooltipTrigger>
-        <TooltipContent side="right">{item.label}</TooltipContent>
+
+        <TooltipContent side="right">
+          {item.label}
+        </TooltipContent>
       </Tooltip>
     );
   }
@@ -328,10 +432,10 @@ function SidebarLink({
   );
 }
 
-/**
- * The navigation itself — shared by the desktop sidebar and the mobile drawer
- * so the menu markup/logic only exists in one place.
- */
+/* -------------------------------------------------------------------------- */
+/*                             Sidebar navigation                              */
+/* -------------------------------------------------------------------------- */
+
 function SidebarNav({
   user,
   collapsed,
@@ -374,41 +478,57 @@ function SidebarNav({
   );
 }
 
-/** Brand + profile + navigation — the body shared by both sidebars. */
+/* -------------------------------------------------------------------------- */
+/*                              Sidebar body                                   */
+/* -------------------------------------------------------------------------- */
+
 function SidebarBody({
   user,
   collapsed,
   onNavigate,
+  isPremium,
 }: {
   user: AuthUser;
   collapsed: boolean;
   onNavigate?: () => void;
+  isPremium: boolean;
 }) {
   return (
     <TooltipProvider delay={0}>
       <div className="flex h-full flex-col">
         <SidebarBrand showText={!collapsed} />
-        <SidebarProfile user={user} showText={!collapsed} />
-        <SidebarNav user={user} collapsed={collapsed} onNavigate={onNavigate} />
+
+        <SidebarProfile
+          user={user}
+          showText={!collapsed}
+          isPremium={isPremium}
+        />
+
+        <SidebarNav
+          user={user}
+          collapsed={collapsed}
+          onNavigate={onNavigate}
+        />
       </div>
     </TooltipProvider>
   );
 }
 
 /* -------------------------------------------------------------------------- */
-/*                                Exported sidebars                            */
+/*                              Desktop sidebar                                */
 /* -------------------------------------------------------------------------- */
 
 interface DashboardSidebarProps {
   user: AuthUser;
   collapsed: boolean;
+  isPremium: boolean;
 }
 
-/**
- * Fixed desktop sidebar (md and up). Collapse state lives in DashboardLayout
- * so the header toggle and the sidebar stay in sync.
- */
-export function DashboardSidebar({ user, collapsed }: DashboardSidebarProps) {
+export function DashboardSidebar({
+  user,
+  collapsed,
+  isPremium,
+}: DashboardSidebarProps) {
   return (
     <aside
       aria-label="Dashboard sidebar"
@@ -417,31 +537,46 @@ export function DashboardSidebar({ user, collapsed }: DashboardSidebarProps) {
         collapsed ? "w-[76px]" : "w-64"
       )}
     >
-      <SidebarBody user={user} collapsed={collapsed} />
+      <SidebarBody
+        user={user}
+        collapsed={collapsed}
+        isPremium={isPremium}
+      />
     </aside>
   );
 }
+
+/* -------------------------------------------------------------------------- */
+/*                               Mobile sidebar                                */
+/* -------------------------------------------------------------------------- */
 
 interface MobileSidebarProps {
   user: AuthUser;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  isPremium: boolean;
 }
 
-/** Left-side drawer for mobile — opened by the hamburger button in the header. */
-export function MobileSidebar({ user, open, onOpenChange }: MobileSidebarProps) {
+export function MobileSidebar({
+  user,
+  open,
+  onOpenChange,
+  isPremium,
+}: MobileSidebarProps) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="left" className="w-72 gap-0 p-0 sm:max-w-xs">
         <SheetHeader className="sr-only">
           <SheetTitle>PizzaHub dashboard menu</SheetTitle>
-          <SheetDescription>Navigation for your dashboard</SheetDescription>
+          <SheetDescription>
+            Navigation for your dashboard
+          </SheetDescription>
         </SheetHeader>
 
-        {/* Clicking any link closes the drawer (onNavigate). */}
         <SidebarBody
           user={user}
           collapsed={false}
+          isPremium={isPremium}
           onNavigate={() => onOpenChange(false)}
         />
       </SheetContent>
