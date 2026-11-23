@@ -34,6 +34,8 @@ import { cn } from "@/lib/utils";
 import { signOut, useSession } from "@/lib/auth-client";
 import { DASHBOARD_HOME } from "@/lib/dashboard-paths";
 import { toast } from "sonner";
+import { useState } from "react";
+import ProfileInfoDialog from "../profile-update-dialogue";
 
 
 
@@ -57,6 +59,7 @@ export function Navbar() {
   const { data: session } = useSession();
 
   const user = session?.user as SessionUser | undefined;
+  const [profileOpen, setProfileOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -114,8 +117,7 @@ export function Navbar() {
         <div className="hidden items-center gap-2 md:flex">
           {user ? (
             <DropdownMenu>
-              {/* The trigger renders a <button>, so it is styled directly
-                  instead of nesting another <Button> inside it. */}
+              
               <DropdownMenuTrigger
                 className={cn(
                   buttonVariants({ variant: "ghost" }),
@@ -139,8 +141,7 @@ export function Navbar() {
               </DropdownMenuTrigger>
 
               <DropdownMenuContent align="end" className="w-56">
-                {/* Base UI: GroupLabel must live inside a Group, otherwise the
-                    menu throws "MenuGroupContext is missing" when it opens. */}
+                
                 <DropdownMenuGroup>
                   <DropdownMenuLabel className="font-normal">
                     <span className="block truncate text-sm font-semibold text-foreground">
@@ -166,16 +167,15 @@ export function Navbar() {
 
                   
 
-                 <DropdownMenuItem
-                    onClick={() => {
-                      const role = user.role ?? "customer";
-
-                      router.push(`${DASHBOARD_HOME[role]}/profile`);
-                    }}
-                  >
-                    <Settings size={16} className="text-red-500" />
-                    Profile Settings
-                  </DropdownMenuItem>
+                 
+                   <ProfileInfoDialog
+                      open={profileOpen}
+                      onOpenChange={setProfileOpen}
+                      name={user.name}
+                      email={user.email}
+                      image={user.image}
+                    />
+                  
 
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="size-4 text-red-500" />
