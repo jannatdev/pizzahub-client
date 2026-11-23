@@ -73,8 +73,8 @@ const SignInForm = () => {
       const role = sessionUser.role ?? signInUser.role ?? "customer";
 
       // Each role lands on its own dashboard overview page.
-      router.push('DASHBOARD_HOME[role]');
-      router.refresh();
+      router.push(DASHBOARD_HOME[role]);
+       router.refresh();
     } catch (error) {
       console.error("Sign in error:", error);
 

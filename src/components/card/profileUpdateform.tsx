@@ -325,7 +325,7 @@ export default function ProfileUpdateForm({
           )}
 
           {/* Profile image URL */}
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <Label htmlFor="image">Profile Image URL</Label>
             <Input
               id="image"
@@ -337,7 +337,7 @@ export default function ProfileUpdateForm({
             <p className="text-xs text-muted-foreground">
               You can also paste an image URL manually.
             </p>
-          </div>
+          </div> */}
 
           {/* Email */}
           <div className="space-y-2">
@@ -368,7 +368,7 @@ export default function ProfileUpdateForm({
           <Button
             type="submit"
             disabled={isSaving || isUploading || !!selectedFile}
-            className="w-full bg-red-600 font-semibold text-white hover:bg-red-700"
+            className="w-40 bg-red-600 font-semibold text-white hover:bg-red-700"
           >
             {isSaving ? "Saving Changes..." : "Save Changes"}
           </Button>
