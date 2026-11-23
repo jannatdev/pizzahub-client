@@ -89,6 +89,7 @@ const statusStyles: Record<OrderStatus, string> = {
   Accepted: "bg-green-100 text-green-700",
   Rejected: "bg-red-100 text-red-700",
   Delivered: "bg-blue-100 text-blue-700",
+  Cancelled: "bg-blue-100 text-blue-700",
 };
 
   return (

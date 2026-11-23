@@ -1,10 +1,32 @@
+'use client';
 
-import { getCurrentUser } from "@/lib/session";
 
-import VendorProfileUpdate from "@/components/dashboard/vendorProfileUpdate";
 
-export default async function VendorProfilePage() {
-  const user = await getCurrentUser();
+import ProfileUpdateForm from "@/components/card/profileUpdateform";
+import { useSession } from "@/lib/auth-client";
 
-  return <VendorProfileUpdate user={user} />;
+export  function VendorProfilePage() {
+ const { data: session, isPending } = useSession();
+
+  if (isPending) {
+    return <p>Loading profile...</p>;
+  }
+
+  if (!session?.user) {
+    return <p>Please sign in to view your profile.</p>;
+  }
+
+  const profile = {
+    name: session.user.name || "",
+    email: session.user.email || "",
+    image: session.user.image || "",
+    role: "customer" as const,
+  };
+
+  
+<ProfileUpdateForm
+  profile={profile}
+  userType="vendor"
+  endpoint="/vendor/profile"
+/> ;
 }

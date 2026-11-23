@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import type { Order } from "@/type/order";
+import type { Order, OrderStatus } from "@/type/order";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -50,15 +50,18 @@ export default function OrdersPage() {
     };
   }, [reloadToken]);
 
-  const handleStatusUpdate = (orderId: string, status: Order["status"]) => {
-    setOrders((previous) =>
-      previous.map((order) =>
-        order._id === orderId
-          ? { ...order, status }
-          : order
-      )
-    );
-  };
+ const handleStatusUpdate = (
+  orderId: string,
+  status: OrderStatus,
+) => {
+  setOrders((previous) =>
+    previous.map((order) =>
+      order._id === orderId
+        ? { ...order, status }
+        : order
+    )
+  );
+};
 
   if (loading) {
     return (

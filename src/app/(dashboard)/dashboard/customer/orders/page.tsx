@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -19,23 +20,35 @@ import {
   PackageOpen,
 } from "lucide-react";
 
+// All supported order filters
 type Filter = "All" | OrderStatus;
 
+// Filter options
 const FILTERS: Filter[] = [
   "All",
   "Pending",
   "Accepted",
   "Rejected",
+  "Delivered",
   "Cancelled",
 ];
 
+// Filter styles
 const FILTER_STYLES: Record<Filter, string> = {
   All: "border-transparent bg-red-600 text-white shadow-sm",
+
   Pending:
     "border-yellow-200 bg-yellow-50 text-yellow-700 hover:bg-yellow-100",
+
   Accepted:
     "border-green-200 bg-green-50 text-green-700 hover:bg-green-100",
-  Rejected: "border-red-200 bg-red-50 text-red-700 hover:bg-red-100",
+
+  Rejected:
+    "border-red-200 bg-red-50 text-red-700 hover:bg-red-100",
+
+  Delivered:
+    "border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100",
+
   Cancelled:
     "border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100",
 };
@@ -46,6 +59,7 @@ export default function CustomerOrdersPage() {
   const [error, setError] = useState("");
   const [filter, setFilter] = useState<Filter>("All");
 
+  // Fetch customer orders
   const fetchOrders = async () => {
     try {
       setLoading(true);
@@ -67,32 +81,33 @@ export default function CustomerOrdersPage() {
     }
   };
 
+  // Initial data loading
   useEffect(() => {
-    // Deferred so the initial load doesn't set state synchronously in the
-    // effect body (react-hooks/set-state-in-effect) — same pattern as the
-    // browse-menu page.
-    const timer = setTimeout(fetchOrders, 0);
+    const timer = setTimeout(() => {
+      void fetchOrders();
+    }, 0);
 
     return () => clearTimeout(timer);
   }, []);
 
+  // Update order after a successful status change
   const handleOrderUpdate = (updatedOrder: Order) => {
     setOrders((previous) =>
       previous.map((order) =>
-        order._id === updatedOrder._id ? updatedOrder : order
+        order._id === updatedOrder._id
+          ? updatedOrder
+          : order
       )
     );
   };
 
-  // Counts per status for the filter pills
+  // Calculate counts for every filter
   const counts = useMemo(() => {
-    const base: Record<Filter, number> = {
-      All: orders.length,
-      Pending: 0,
-      Accepted: 0,
-      Rejected: 0,
-      Cancelled: 0,
-    };
+    const base = Object.fromEntries(
+      FILTERS.map((item) => [item, 0])
+    ) as Record<Filter, number>;
+
+    base.All = orders.length;
 
     for (const order of orders) {
       base[order.status] += 1;
@@ -101,13 +116,20 @@ export default function CustomerOrdersPage() {
     return base;
   }, [orders]);
 
-  const visibleOrders =
-    filter === "All"
-      ? orders
-      : orders.filter((order) => order.status === filter);
+  // Filter orders
+  const visibleOrders = useMemo(() => {
+    if (filter === "All") {
+      return orders;
+    }
+
+    return orders.filter(
+      (order) => order.status === filter
+    );
+  }, [orders, filter]);
 
   return (
     <div className="space-y-6">
+
       {/* Heading */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
@@ -119,6 +141,7 @@ export default function CustomerOrdersPage() {
             <h1 className="text-2xl font-bold tracking-tight">
               My Orders
             </h1>
+
             <p className="mt-0.5 text-sm text-muted-foreground">
               Track and manage your pizza orders.
             </p>
@@ -128,11 +151,11 @@ export default function CustomerOrdersPage() {
         <Button
           variant="outline"
           size="sm"
-          onClick={fetchOrders}
+          onClick={() => fetchOrders()}
           disabled={loading}
         >
           <RefreshCw
-            className={`mr-2 h-4 w-4 ${
+            className={`mr-2 size-4 ${
               loading ? "animate-spin" : ""
             }`}
           />
@@ -140,7 +163,7 @@ export default function CustomerOrdersPage() {
         </Button>
       </div>
 
-      {/* Status filter pills (hidden while loading/erroring) */}
+      {/* Status filter pills */}
       {!loading && !error && orders.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {FILTERS.map((value) => (
@@ -148,14 +171,23 @@ export default function CustomerOrdersPage() {
               key={value}
               type="button"
               onClick={() => setFilter(value)}
-              className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors ${FILTER_STYLES[value]}`}
+              className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors ${
+                filter === value
+                  ? value === "All"
+                    ? FILTER_STYLES.All
+                    : FILTER_STYLES[value]
+                  : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
+              }`}
             >
-              {value}
+              {value === "Cancelled" ? "Cancelled" : value}
+
               <span
                 className={`rounded-full px-1.5 text-xs ${
-                  filter === value && value === "All"
-                    ? "bg-white/20"
-                    : "bg-black/5"
+                  filter === value
+                    ? value === "All"
+                      ? "bg-white/20"
+                      : "bg-black/5"
+                    : "bg-gray-100"
                 }`}
               >
                 {counts[value]}
@@ -171,7 +203,8 @@ export default function CustomerOrdersPage() {
           {[1, 2, 3].map((item) => (
             <Card key={item}>
               <CardContent className="flex gap-4 p-5">
-                <Skeleton className="h-28 w-28 rounded-lg" />
+                <Skeleton className="size-28 rounded-lg" />
+
                 <div className="flex-1 space-y-3">
                   <Skeleton className="h-5 w-1/2" />
                   <Skeleton className="h-4 w-1/3" />
@@ -188,23 +221,31 @@ export default function CustomerOrdersPage() {
       {!loading && error && (
         <Card>
           <CardContent className="flex flex-col items-center gap-3 py-10 text-center">
-            <p className="text-sm text-red-600">{error}</p>
-            <Button onClick={fetchOrders} variant="outline">
+            <p className="text-sm text-red-600">
+              {error}
+            </p>
+
+            <Button
+              onClick={() => fetchOrders()}
+              variant="outline"
+            >
               Try Again
             </Button>
           </CardContent>
         </Card>
       )}
 
-      {/* Empty — no orders at all */}
+      {/* Empty — no orders */}
       {!loading && !error && orders.length === 0 && (
         <Card className="border-dashed">
           <CardContent className="flex flex-col items-center py-14 text-center">
             <div className="mb-4 flex size-14 items-center justify-center rounded-full bg-orange-50 text-orange-500">
-              <PackageOpen className="h-7 w-7" />
+              <PackageOpen className="size-7" />
             </div>
 
-            <h3 className="text-lg font-semibold">No Orders Yet</h3>
+            <h3 className="text-lg font-semibold">
+              No Orders Yet
+            </h3>
 
             <p className="mt-2 max-w-sm text-sm text-muted-foreground">
               You haven&apos;t placed any orders yet. Browse the menu
@@ -221,17 +262,19 @@ export default function CustomerOrdersPage() {
         </Card>
       )}
 
-      {/* Empty — filter has no matches */}
+      {/* Empty — no matching orders */}
       {!loading &&
         !error &&
         orders.length > 0 &&
         visibleOrders.length === 0 && (
           <Card className="border-dashed">
             <CardContent className="flex flex-col items-center py-12 text-center">
-              <PackageOpen className="mb-3 h-9 w-9 text-muted-foreground" />
+              <PackageOpen className="mb-3 size-9 text-muted-foreground" />
+
               <p className="text-sm text-muted-foreground">
                 No {filter.toLowerCase()} orders.
               </p>
+
               <Button
                 variant="outline"
                 size="sm"

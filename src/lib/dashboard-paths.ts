@@ -11,6 +11,6 @@ export const DASHBOARD_HOME: Record<UserRole, string> = {
  
   admin: "/dashboard/admin/overview",
   vendor: "/dashboard/vendor/overview",
-  customer: "/dashboard/customer",
+  customer: "/dashboard/customer/overview",
 
 };

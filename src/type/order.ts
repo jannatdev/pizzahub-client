@@ -1,10 +1,5 @@
 
 
-export type OrderStatus =
-  | "Pending"
-  | "Accepted"
-  | "Rejected"
-  | "Delivered";
 
 
 /**
@@ -19,25 +14,28 @@ export interface ApiResponse<T = unknown> {
   order?: T;
 }
 
+export type OrderStatus =
+  | "Pending"
+  | "Accepted"
+  | "Rejected"
+  | "Delivered"
+  | "Cancelled";
+
 export interface Order {
   _id: string;
-  status: "Pending" | "Accepted" | "Rejected" | "Delivered";
   createdAt: string;
-
   customerName: string;
   customerEmail: string;
-
   itemName: string;
-  itemImage?: string; // Add this
+  itemImage?: string;
   quantity: number;
   price: number;
   totalPrice: number;
-
   deliveryDate: string;
   deliveryAddress: string;
   additionalMessage?: string;
+  status: OrderStatus;
 }
-
 export interface VendorOrdersResponse {
   success: boolean;
   message: string;
