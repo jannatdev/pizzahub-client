@@ -3,6 +3,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
 import {
   ChevronDown,
   LayoutDashboard,
@@ -11,7 +12,6 @@ import {
   Pizza,
   Settings,
 } from "lucide-react";
-import { useState } from "react";
 
 import {
   Avatar,
@@ -55,7 +55,7 @@ type SessionUser = {
   role?: UserRole;
 };
 
-function getInitials(name: string): string {
+function getInitials(name: string) {
   return name
     .split(" ")
     .map((part) => part[0])
@@ -75,30 +75,29 @@ export function Navbar() {
   const router = useRouter();
 
   const handleLogout = async () => {
-    await signOut({
-      fetchOptions: {
-        onSuccess: () => {
-          toast.success("Log out is success!");
-          router.push("/");
-          router.refresh();
+    try {
+      await signOut({
+        fetchOptions: {
+          onSuccess: () => {
+            toast.success("Log out is success!");
+            router.push("/");
+            router.refresh();
+          },
         },
-      },
-    });
+      });
+    } catch {
+      toast.error("Unable to log out. Please try again.");
+    }
   };
 
   const handleDashboard = () => {
-    setMobileOpen(false);
-    router.push(DASHBOARD_HOME[user?.role ?? "customer"]);
+    if (!user) return;
+    router.push(DASHBOARD_HOME[user.role ?? "customer"]);
   };
 
-  const handleProfile = () => {
+  const openProfile = () => {
     setMobileOpen(false);
     setProfileOpen(true);
-  };
-
-  const handleMobileLogout = async () => {
-    setMobileOpen(false);
-    await handleLogout();
   };
 
   const links = [
@@ -125,7 +124,6 @@ export function Navbar() {
             <span className="flex size-9 items-center justify-center rounded-full bg-red-600 text-white">
               <Pizza className="size-5" />
             </span>
-
             <span className="text-xl font-extrabold tracking-tight">
               <span className="text-red-600">Pizza</span>
               <span className="text-orange-500">Hub</span>
@@ -148,31 +146,27 @@ export function Navbar() {
           {/* Desktop Authentication */}
           <div className="hidden items-center gap-2 md:flex">
             {user ? (
-              <DropdownMenu modal={false}>
+              <DropdownMenu>
                 <DropdownMenuTrigger >
-                  <Button
+                  <button
                     type="button"
-                    variant="ghost"
-                    className="h-10 gap-2 px-2"
+                    className="inline-flex h-10 items-center gap-2 rounded-md px-2 text-sm font-medium outline-none hover:bg-red-50 focus-visible:ring-2 focus-visible:ring-red-500"
                   >
                     <Avatar className="size-7">
                       {user.image && (
-                        <AvatarImage
-                          src={user.image}
-                          alt={user.name}
-                        />
+                        <AvatarImage src={user.image} alt={user.name} />
                       )}
                       <AvatarFallback className="bg-red-100 text-xs font-semibold text-red-700">
                         {getInitials(user.name || "User")}
                       </AvatarFallback>
                     </Avatar>
 
-                    <span className="max-w-28 truncate text-sm font-medium">
+                    <span className="max-w-28 truncate">
                       {user.name}
                     </span>
 
                     <ChevronDown className="size-4 opacity-60" />
-                  </Button>
+                  </button>
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent
@@ -196,7 +190,7 @@ export function Navbar() {
                     Dashboard
                   </DropdownMenuItem>
 
-                  <DropdownMenuItem onSelect={handleProfile}>
+                  <DropdownMenuItem onSelect={openProfile}>
                     <Settings className="mr-2 size-4 text-red-500" />
                     Profile Settings
                   </DropdownMenuItem>
@@ -276,10 +270,7 @@ export function Navbar() {
                     <div className="flex items-center gap-3 px-2 py-2">
                       <Avatar className="size-9">
                         {user.image && (
-                          <AvatarImage
-                            src={user.image}
-                            alt={user.name}
-                          />
+                          <AvatarImage src={user.image} alt={user.name} />
                         )}
                         <AvatarFallback className="bg-red-100 text-red-600">
                           {getInitials(user.name || "User")}
@@ -299,7 +290,10 @@ export function Navbar() {
                     <Button
                       variant="ghost"
                       className="w-full justify-start gap-2"
-                      onClick={handleDashboard}
+                      onClick={() => {
+                        setMobileOpen(false);
+                        handleDashboard();
+                      }}
                     >
                       <LayoutDashboard className="size-4 text-red-500" />
                       Dashboard
@@ -308,7 +302,7 @@ export function Navbar() {
                     <Button
                       variant="ghost"
                       className="w-full justify-start gap-2"
-                      onClick={handleProfile}
+                      onClick={openProfile}
                     >
                       <Settings className="size-4 text-red-500" />
                       Profile Settings
@@ -317,14 +311,17 @@ export function Navbar() {
                     <Button
                       variant="ghost"
                       className="w-full justify-start gap-2"
-                      onClick={handleMobileLogout}
+                      onClick={() => {
+                        setMobileOpen(false);
+                        handleLogout();
+                      }}
                     >
                       <LogOut className="size-4 text-red-500" />
                       Logout
                     </Button>
                   </div>
-                ) : (
-                  <div className="flex flex-col gap-2">
+                ) :
+                  (<div className="flex flex-col gap-2">
                     <SheetClose >
                       <Button
                         variant="outline"
@@ -345,15 +342,15 @@ export function Navbar() {
                         Sign Up
                       </Button>
                     </SheetClose>
-                  </div>
-                )}
+                  </div>)
+                }
               </div>
             </SheetContent>
           </Sheet>
         </div>
       </header>
 
-      {/* One shared Profile Dialog */}
+      {/* Profile Dialog - rendered once, outside dropdown and sheet */}
       {user && (
         <ProfileInfoDialog
           open={profileOpen}
