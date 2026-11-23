@@ -34,13 +34,9 @@ import { cn } from "@/lib/utils";
 import { signOut, useSession } from "@/lib/auth-client";
 import { DASHBOARD_HOME } from "@/lib/dashboard-paths";
 import { toast } from "sonner";
-import ProfileInfoDialog from "../profile-update-dialogue";
 
-/**
- * Better Auth's client types only expose the core user fields. `role` is
- * declared server-side (see `user.additionalFields` in src/lib/auth.ts), so it
- * must be declared here. It stays optional because the DB field is not required.
- */
+
+
 type SessionUser = {
   name: string;
   email: string;
@@ -60,14 +56,10 @@ function getInitials(name: string): string {
 export function Navbar() {
   const { data: session } = useSession();
 
-  // Cast to SessionUser: `role` exists on the stored user but not on Better
-  // Auth's inferred client type. Absent role falls back to "customer".
   const user = session?.user as SessionUser | undefined;
   const pathname = usePathname();
   const router = useRouter();
 
-  // Better Auth sign-out — clears the session cookie on the server and the
-  // `useSession` subscription updates this Navbar immediately.
   const handleLogout = async () => {
     await signOut({
       fetchOptions: {
@@ -172,6 +164,8 @@ export function Navbar() {
                     Dashboard
                   </DropdownMenuItem>
 
+                  
+
                   <DropdownMenuItem
                     onClick={() =>
                       router.push(
@@ -179,12 +173,9 @@ export function Navbar() {
                       )
                     }
                   >
-                   
-                   <ProfileInfoDialog
-                      name={user.name}
-                      email={user.email}
-                      image={user.image}
-                    />
+                    <Settings size={16} className="text-red-600" />
+                    Profile Settings
+                  
                    </DropdownMenuItem>
 
                   <DropdownMenuItem onClick={handleLogout}>
