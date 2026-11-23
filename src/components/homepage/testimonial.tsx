@@ -102,7 +102,7 @@ export default function TestimonialsSection() {
   }, [api]);
 
   return (
-    <section className="relative overflow-hidden bg-[#fff8f2] py-20 md:py-28">
+    <section className="relative overflow-hidden bg-red-50/25 py-20 md:py-28">
 
       {/* Decorative Background */}
       <div className="absolute -left-40 top-20 h-96 w-96 rounded-full bg-orange-200/30 blur-[100px]" />
@@ -118,12 +118,12 @@ export default function TestimonialsSection() {
           transition={{ duration: 0.6 }}
           className="mx-auto mb-16 max-w-3xl text-center"
         >
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-orange-200 bg-white px-5 py-2 text-xs font-bold uppercase tracking-[0.2em] text-[#d94b20] shadow-sm">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border italic px-5 py-2 text-xs font-bold uppercase tracking-[0.2em] text-[#d94b20] shadow-sm">
             <Star className="h-4 w-4 fill-current" />
             The PizzaHub Experience
           </div>
 
-          <h2 className="text-4xl font-black leading-tight tracking-tight text-[#250808] sm:text-5xl md:text-6xl">
+          <h2 className="text-4xl font-black leading-tight tracking-tight text-[#250808] sm:text-3xl md:text-5xl">
             Stories That
             <span className="block text-[#e34b27]">
               Make Us Smile.
@@ -161,17 +161,17 @@ export default function TestimonialsSection() {
                     transition={{ duration: 0.5 }}
                     className="h-full"
                   >
-                    <div className="group relative flex h-full min-h-[390px] flex-col overflow-hidden rounded-[30px] bg-gradient-to-br from-[#390d0d] via-[#250808] to-[#160505] p-7 text-white shadow-[0_25px_70px_-25px_rgba(37,8,8,0.4)] sm:p-10 md:p-12">
+                    <div className="group relative flex h-full min-h-[390px] flex-col overflow-hidden rounded-[30px] border border-red-100 bg-white p-7 text-[#250808] shadow-[0_15px_50px_-20px_rgba(220,38,38,0.12)] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl sm:p-10 md:p-12">
 
                       {/* Decorative shapes */}
-                      <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full border-[35px] border-white/[0.035]" />
+                      <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full border-[35px] border-red-50" />
 
-                      <div className="pointer-events-none absolute -bottom-24 -left-16 h-64 w-64 rounded-full bg-red-600/10 blur-3xl" />
+                      <div className="pointer-events-none absolute -bottom-24 -left-16 h-64 w-64 rounded-full bg-red-100/40 blur-3xl" />
 
                       {/* Top Row */}
                       <div className="relative z-10 flex items-center justify-between">
                         <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#e34b27] shadow-lg shadow-red-950/30">
-                          <Quote className="h-6 w-6 fill-white text-white" />
+                          <Quote className="h-6 w-6 fill-white text-black" />
                         </div>
 
                         <div className="flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.07] px-4 py-2">
@@ -180,10 +180,10 @@ export default function TestimonialsSection() {
                           }).map((_, i) => (
                             <Star
                               key={i}
-                              className="h-4 w-4 fill-[#ffb52e] text-[#ffb52e]"
+                              className="h-4 w-4 fill-orange-600 text-[#ffb52e]"
                             />
                           ))}
-                          <span className="ml-2 text-xs font-bold text-white/80">
+                          <span className="ml-2 text-xs font-bold text-black/80">
                             {testimonial.rating}.0
                           </span>
                         </div>
@@ -191,11 +191,11 @@ export default function TestimonialsSection() {
 
                       {/* Review */}
                       <div className="relative z-10 my-auto py-8">
-                        <p className="mb-4 text-xs font-bold uppercase tracking-[0.22em] text-[#ff9875]">
+                        <p className="mb-4 text-xs font-bold uppercase tracking-[0.22em] text-orange-500">
                           {testimonial.highlight}
                         </p>
 
-                        <h3 className="max-w-2xl text-2xl font-semibold leading-relaxed tracking-tight text-white sm:text-3xl md:text-[34px]">
+                        <h3 className="max-w-2xl text-2xl font-semibold leading-relaxed tracking-tight text-black sm:text-[24xl] md:text-[24px]">
                          &ldquo;{testimonial.review}&rdquo;
                         </h3>
                       </div>
@@ -216,11 +216,11 @@ export default function TestimonialsSection() {
                           </Avatar>
 
                           <div>
-                            <h4 className="font-bold text-white">
+                            <h4 className="font-bold text-black/90">
                               {testimonial.name}
                             </h4>
 
-                            <p className="mt-1 text-xs text-white/50">
+                            <p className="mt-1 text-xs text-black/50">
                               {testimonial.location}
                             </p>
                           </div>
@@ -233,10 +233,10 @@ export default function TestimonialsSection() {
                           </div>
 
                           <div>
-                            <p className="text-[10px] font-semibold uppercase tracking-wider text-white/40">
+                            <p className="text-[10px] font-semibold uppercase tracking-wider text-black/50">
                               Loved ordering
                             </p>
-                            <p className="mt-1 text-sm font-semibold text-white">
+                            <p className="mt-1 text-sm font-semibold text-black/90">
                               {testimonial.order}
                             </p>
                           </div>
@@ -305,7 +305,7 @@ export default function TestimonialsSection() {
         </div>
 
         {/* Bottom Trust Banner */}
-        <motion.div
+        {/* <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -331,7 +331,7 @@ export default function TestimonialsSection() {
             Made for pizza lovers
             <ArrowUpRight className="h-4 w-4" />
           </div>
-        </motion.div>
+        </motion.div> */}
 
       </div>
     </section>

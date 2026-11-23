@@ -12,6 +12,8 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
+import combo from '@/app/asset/combo.png'
 
 const comboItems = [
   {
@@ -177,7 +179,7 @@ const ComboOfferSection = () => {
           </motion.div>
 
           {/* Combo cards */}
-          {comboItems.map((item, index) => {
+          {/* {comboItems.map((item, index) => {
             const Icon = item.icon;
 
             return (
@@ -231,10 +233,10 @@ const ComboOfferSection = () => {
                 </div>
               </motion.div>
             );
-          })}
+          })} */}
 
           {/* Center offer badge */}
-          <motion.div
+          {/* <motion.div
             initial={
               reduceMotion
                 ? false
@@ -265,11 +267,27 @@ const ComboOfferSection = () => {
                 DEAL
               </p>
             </div>
-          </motion.div>
+          </motion.div> */}
+
+         <div className="bg-orange-500/50 rounded-full">
+          <Image
+
+          src={combo}
+          alt= "iamge"
+          fill
+          className="w-80 h-auto rounded-full border-4 border-orange-500"
+
+          />
+            
+
+       
+         </div>
+
+
+
         </motion.div>
       </div>
     </section>
-  );
-};
+  );};
 
 export default ComboOfferSection;

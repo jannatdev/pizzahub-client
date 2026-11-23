@@ -37,7 +37,7 @@ async function AuthorizedShell({ children }: { children: ReactNode }) {
     <div className="bg-red-50 ">
       <DashboardLayout user={{ ...user, isPremium: plan?.isPremium ?? false }}>
         {children}
-          <Footer></Footer>
+         
       </DashboardLayout>
     
     </div>

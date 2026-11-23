@@ -9,7 +9,7 @@ const RootLayout = ({children}:{children:React.ReactNode}) => {
             <AuthProvider>
                   <Navbar />
                  {children}
-                 <Footer></Footer>
+               
             </AuthProvider>
            
         </div>

@@ -38,7 +38,7 @@ export default async function Home() {
       <FeaturedMenuSection isLoggedIn={isLoggedIn}/>
       <PopularPizzaCombos />
       <TestimonialsSection></TestimonialsSection>
-      <Footer></Footer>
+      
     </main>
   );
 }
