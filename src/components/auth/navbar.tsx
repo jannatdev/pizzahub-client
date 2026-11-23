@@ -22,7 +22,10 @@ import {
 
 import { Button } from "@/components/ui/button";
 
+
+
 import {
+  DropdownMenuGroup,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -148,40 +151,41 @@ export function Navbar() {
           {/* Desktop Authentication */}
           <div className="hidden items-center gap-2 md:flex">
             {user ? (
+             
               <DropdownMenu>
-                <DropdownMenuTrigger >
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    className="h-10 gap-2 px-2"
-                  >
-                    <Avatar className="size-7">
-                      {user.image && (
-                        <AvatarImage
-                          src={user.image}
-                          alt={user.name}
-                        />
-                      )}
+                <DropdownMenuTrigger
+                  type="button"
+                  className="inline-flex h-10 items-center gap-2 rounded-md px-2 outline-none transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-red-500"
+                >
+                  <Avatar className="size-7">
+                    {user.image && (
+                      <AvatarImage
+                        src={user.image}
+                        alt={user.name}
+                      />
+                    )}
 
-                      <AvatarFallback className="bg-red-100 text-xs font-semibold text-red-700">
-                        {getInitials(user.name || "User")}
-                      </AvatarFallback>
-                    </Avatar>
+                    <AvatarFallback className="bg-red-100 text-xs font-semibold text-red-700">
+                      {getInitials(user.name || "User")}
+                    </AvatarFallback>
+                  </Avatar>
 
-                    <span className="max-w-28 truncate text-sm font-medium">
-                      {user.name}
-                    </span>
+                  <span className="max-w-28 truncate text-sm font-medium">
+                    {user.name}
+                  </span>
 
-                    <ChevronDown className="size-4 opacity-60" />
-                  </Button>
+                  <ChevronDown className="size-4 opacity-60" />
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent
                   align="end"
+                  side="bottom"
                   sideOffset={8}
                   className="z-[100] w-56 bg-white"
                 >
-                  <DropdownMenuLabel className="font-normal">
+
+                  <DropdownMenuGroup>
+                      <DropdownMenuLabel className="font-normal">
                     <span className="block truncate text-sm font-semibold">
                       {user.name}
                     </span>
@@ -190,6 +194,9 @@ export function Navbar() {
                       {user.email}
                     </span>
                   </DropdownMenuLabel>
+
+                  </DropdownMenuGroup>
+                
 
                   <DropdownMenuSeparator />
 
@@ -205,12 +212,16 @@ export function Navbar() {
 
                   <DropdownMenuSeparator />
 
-                  <DropdownMenuItem onSelect={handleLogout}>
-                    <LogOut className="mr-2 size-4 text-red-500" />
+                  <DropdownMenuItem
+                    onSelect={handleLogout}
+                    className="text-red-600 focus:text-red-600"
+                  >
+                    <LogOut className="mr-2 size-4" />
                     Logout
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+
             ) : (
               <>
                 <Button
