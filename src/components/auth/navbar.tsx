@@ -114,50 +114,48 @@ export function Navbar() {
         </nav>
 
         {/* Desktop auth area */}
+        {/* Desktop auth area */}
         <div className="hidden items-center gap-2 md:flex">
           {user ? (
-            <DropdownMenu>
-              
-              <DropdownMenuTrigger
-                className={cn(
-                  buttonVariants({ variant: "ghost" }),
-                  "h-9 gap-2 px-2"
-                )}
-              >
-                <Avatar className="size-7">
-                  {user.image ? (
-                    <AvatarImage src={user.image} alt={user.name} />
-                  ) : null}
-                  <AvatarFallback className="bg-red-100 text-xs font-semibold text-red-700">
-                    {getInitials(user.name)}
-                  </AvatarFallback>
-                </Avatar>
+            <>
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  className={cn(
+                    buttonVariants({ variant: "ghost" }),
+                    "h-9 gap-2 px-2"
+                  )}
+                >
+                  <Avatar className="size-7">
+                    {user.image ? (
+                      <AvatarImage src={user.image} alt={user.name} />
+                    ) : null}
 
-                <span className="hidden max-w-28 truncate text-sm font-medium sm:inline">
-                  {user.name}
-                </span>
+                    <AvatarFallback className="bg-red-100 text-xs font-semibold text-red-700">
+                      {getInitials(user.name)}
+                    </AvatarFallback>
+                  </Avatar>
 
-                <ChevronDown className="size-4 opacity-60" />
-              </DropdownMenuTrigger>
+                  <span className="hidden max-w-28 truncate text-sm font-medium sm:inline">
+                    {user.name}
+                  </span>
 
-              <DropdownMenuContent align="end" className="w-56">
-                
-                <DropdownMenuGroup>
+                  <ChevronDown className="size-4 opacity-60" />
+                </DropdownMenuTrigger>
+
+                <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuLabel className="font-normal">
-                    <span className="block truncate text-sm font-semibold text-foreground">
+                    <span className="block truncate text-sm font-semibold">
                       {user.name}
                     </span>
                     <span className="block truncate text-xs text-muted-foreground">
                       {user.email}
                     </span>
                   </DropdownMenuLabel>
-                </DropdownMenuGroup>
 
-                <DropdownMenuSeparator />
+                  <DropdownMenuSeparator />
 
-                <DropdownMenuGroup>
                   <DropdownMenuItem
-                    onClick={() =>
+                    onSelect={() =>
                       router.push(DASHBOARD_HOME[user.role ?? "customer"])
                     }
                   >
@@ -165,31 +163,33 @@ export function Navbar() {
                     Dashboard
                   </DropdownMenuItem>
 
-                  
-                <DropdownMenuItem>
-                      <ProfileInfoDialog
-                      open={profileOpen}
-                      onOpenChange={setProfileOpen}
-                      name={user.name}
-                      email={user.email}
-                      image={user.image}
-                    />
+                  <DropdownMenuItem
+                    onSelect={() => setProfileOpen(true)}
+                  >
+                    <Settings className="size-4 text-red-500" />
+                    Profile Settings
+                  </DropdownMenuItem>
 
-                </DropdownMenuItem>                 
-
-                  <DropdownMenuItem onClick={handleLogout}>
+                  <DropdownMenuItem onSelect={handleLogout}>
                     <LogOut className="size-4 text-red-500" />
                     Logout
                   </DropdownMenuItem>
-                </DropdownMenuGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <ProfileInfoDialog
+                open={profileOpen}
+                onOpenChange={setProfileOpen}
+                name={user.name}
+                email={user.email}
+                image={user.image}
+              />
+            </>
           ) : (
             <>
-            <Button
+              <Button
                 variant="outline"
                 render={<Link href="/sign-in" />}
-                // The root element is an <a>, not a <button>.
                 nativeButton={false}
                 className="border border-red-600"
               >
