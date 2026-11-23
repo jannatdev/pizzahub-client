@@ -160,26 +160,25 @@ export function Navbar() {
                       router.push(DASHBOARD_HOME[user.role ?? "customer"])
                     }
                   >
-                    <LayoutDashboard className="size-4" />
+                    <LayoutDashboard className="size-4 text-red-500" />
                     Dashboard
                   </DropdownMenuItem>
 
                   
 
-                  <DropdownMenuItem
-                    onClick={() =>
-                      router.push(
-                        `${DASHBOARD_HOME[user.role ?? "customer"]}/profile`
-                      )
-                    }
+                 <DropdownMenuItem
+                    onClick={() => {
+                      const role = user.role ?? "customer";
+
+                      router.push(`${DASHBOARD_HOME[role]}/profile`);
+                    }}
                   >
-                    <Settings size={16} className="text-red-600" />
+                    <Settings size={16} className="text-red-500" />
                     Profile Settings
-                  
-                   </DropdownMenuItem>
+                  </DropdownMenuItem>
 
                   <DropdownMenuItem onClick={handleLogout}>
-                    <LogOut className="size-4" />
+                    <LogOut className="size-4 text-red-500" />
                     Logout
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
