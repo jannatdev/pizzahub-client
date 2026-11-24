@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
   AlertTriangle,
-  ArrowLeft,
   ChevronLeft,
   ChevronRight,
   Loader2,
@@ -189,7 +188,6 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
   // Rating stars (visual only — backend does not expose a rating yet)
   const starCount = 4;
   const reviewCount = 2;
-
   // ---------------------------------------------------------------
   // Place order — step 1 opens the delivery form, step 2 submits
   // (backend re-validates everything)
@@ -219,7 +217,7 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
     try {
       await createOrder({
         menuId: menuItem._id,
-        quantity: 1,
+        quantity,
         deliveryDate,
         deliveryAddress: deliveryAddress.trim(),
         additionalMessage: additionalMessage.trim() || undefined,
@@ -290,7 +288,7 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
 
           <Button
             render={<Link href="/browse-menu" />}
-            className="bg-red-600 text-white hover:bg-red-700"
+            className="bg-orange-500 text-white hover:bg-orange-600"
           >
             Browse Menu
           </Button>
@@ -323,7 +321,7 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
 
           <Button
             render={<Link href="/browse-menu" />}
-            className="bg-red-600 text-white hover:bg-red-700"
+            className="bg-orange-500 text-white hover:bg-orange-600"
           >
             Browse Menu
           </Button>
@@ -353,34 +351,48 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
       </Badge>
     );
 
-  const stars = Array.from({ length: starCount }).map((_, i) => (
-    <Star
-      key={i}
-      className="h-4 w-4 fill-yellow-400 text-yellow-400"
-    />
-  ));
+  // 4 full stars + 1 half star (visual placeholder — see starCount above)
+  const stars = (
+    <>
+      {Array.from({ length: starCount }).map((_, i) => (
+        <Star
+          key={i}
+          className="h-4 w-4 fill-yellow-400 text-yellow-400"
+        />
+      ))}
+      <span className="relative inline-flex">
+        <Star className="h-4 w-4 text-gray-300" />
+        <span className="absolute inset-0 w-1/2 overflow-hidden">
+          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+        </span>
+      </span>
+    </>
+  );
 
   const totalPrice = menuItem.price * quantity;
 
+  // Real tag values available in the data model (no fake demo tags)
+  const tags = [menuItem.category, menuItem.location].filter(Boolean);
+
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-      {/* Breadcrumb */}
-      <nav className="flex items-center gap-1 text-sm text-muted-foreground mb-6">
+      {/* Breadcrumb — Home » Category » Item */}
+      <nav className="mb-6 flex flex-wrap items-center gap-1.5 text-sm font-medium">
         <Link
           href="/"
-          className="text-red-600 hover:text-red-700 hover:underline"
+          className="text-gray-900 hover:text-orange-500"
         >
           Home
         </Link>
-        <span className="text-gray-400">›</span>
+        <span className="text-gray-400">»</span>
         <Link
           href="/browse-menu"
-          className="text-red-600 hover:text-red-700 hover:underline"
+          className="text-gray-900 hover:text-orange-500"
         >
           {menuItem.category}
         </Link>
-        <span className="text-gray-400">›</span>
-        <span className="text-gray-900 font-medium">
+        <span className="text-gray-400">»</span>
+        <span className="text-orange-500">
           {menuItem.itemName}
         </span>
       </nav>
@@ -390,15 +402,22 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
         {/* Image gallery                                             */}
         {/* ------------------------------------------------------- */}
         <div className="space-y-4">
-          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl border border-red-100 bg-red-50">
-            <Image
-              src={galleryImages[activeIndex]}
-              alt={`${menuItem.itemName} — image ${activeIndex + 1} of ${galleryImages.length}`}
-              fill
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              className="object-cover"
-              priority
-            />
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg bg-gray-100">
+            {galleryImages[activeIndex] ? (
+              <Image
+                src={galleryImages[activeIndex]}
+                alt={`${menuItem.itemName} — image ${activeIndex + 1} of ${galleryImages.length}`}
+                fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover"
+                priority
+              />
+            ) : (
+              /* No image uploaded for this item */
+              <div className="flex h-full w-full items-center justify-center bg-orange-50">
+                <UtensilsCrossed className="h-16 w-16 text-orange-200" />
+              </div>
+            )}
 
             {/* Previous / next (only when there is more than one image) */}
             {galleryImages.length > 1 && (
@@ -407,7 +426,7 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
                   type="button"
                   aria-label="Previous image"
                   onClick={showPrevImage}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2 text-red-600 shadow-sm transition hover:bg-white"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2 text-orange-500 shadow-sm transition hover:bg-white"
                 >
                   <ChevronLeft className="h-5 w-5" />
                 </button>
@@ -416,7 +435,7 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
                   type="button"
                   aria-label="Next image"
                   onClick={showNextImage}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2 text-red-600 shadow-sm transition hover:bg-white"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2 text-orange-500 shadow-sm transition hover:bg-white"
                 >
                   <ChevronRight className="h-5 w-5" />
                 </button>
@@ -431,7 +450,7 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
                       onClick={() => setActiveIndex(index)}
                       className={`h-2 w-2 rounded-full transition ${
                         index === activeIndex
-                          ? "bg-red-600"
+                          ? "bg-orange-500"
                           : "bg-white/80"
                       }`}
                     />
@@ -448,10 +467,10 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
                 key={index}
                 type="button"
                 onClick={() => setActiveIndex(index)}
-                className={`shrink-0 w-24 h-24 rounded-lg border overflow-hidden ${
+                className={`relative shrink-0 w-24 h-24 rounded-md border overflow-hidden ${
                   activeIndex === index
-                    ? "border-red-600 ring-2 ring-red-600"
-                    : "border-red-100 hover:border-red-200 transition"
+                    ? "border-orange-500 ring-2 ring-orange-500/40"
+                    : "border-gray-200 hover:border-orange-300 transition"
                 }`}
               >
                 <Image
@@ -469,54 +488,48 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
         {/* Item information                                          */}
         {/* ------------------------------------------------------- */}
         <div className="space-y-5">
-          {/* Category + status */}
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge className="bg-orange-500 font-semibold text-white">
-              {menuItem.category}
-            </Badge>
-            {statusBadge}
-          </div>
+          {/* Availability status */}
+          <div>{statusBadge}</div>
 
           {/* Name */}
-          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
+          <h1 className="text-3xl font-extrabold uppercase tracking-tight sm:text-4xl">
             {menuItem.itemName}
           </h1>
 
           {/* Rating */}
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {stars}
-            <span className="text-sm text-muted-foreground">
+            <span className="text-sm font-medium text-gray-700">
               ({reviewCount} customer reviews)
             </span>
           </div>
 
           {/* Short description */}
-          {menuItem.description ? (
-            <p className="text-muted-foreground leading-relaxed">
-              {menuItem.description}
-            </p>
-          ) : null}
+          <p className="text-sm leading-relaxed text-gray-500 sm:text-base">
+            {menuItem.description ||
+              "No description available for this item."}
+          </p>
 
           {/* Price */}
-          <div className="flex items-baseline gap-3">
-            <span className="text-4xl font-extrabold text-red-600">
+          <div className="flex flex-wrap items-baseline gap-3">
+            <span className="text-4xl font-bold text-orange-500">
               ৳{menuItem.price}
             </span>
-          </div>
 
-          {/* Location */}
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <MapPin className="h-4 w-4 text-orange-500" />
-            <span>{menuItem.location}</span>
+            {quantity > 1 ? (
+              <span className="text-sm font-medium text-gray-500">
+                Total ৳{totalPrice}
+              </span>
+            ) : null}
           </div>
 
           {/* Order actions */}
-          <div className="flex flex-col sm:flex-row items-end gap-4">
+          <div className="flex flex-wrap items-center gap-3">
             {/* Session still loading — avoid flashing the wrong button */}
             {isPending ? (
               <Button
                 size="lg"
-                className="w-full sm:w-auto"
+                className="h-12 w-full px-6 sm:w-auto"
                 disabled
               >
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -527,55 +540,68 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
               <Button
                 size="lg"
                 render={<Link href="/sign-in" />}
-                className="w-full sm:w-auto bg-red-600 text-white hover:bg-red-700"
+                className="h-12 w-full bg-orange-500 px-8 text-white hover:bg-orange-600 sm:w-auto"
               >
                 Login to Order
               </Button>
             ) : role === "admin" ? (
               /* Admin → cannot place customer orders */
-              <Button size="lg" className="w-full sm:w-auto" disabled>
+              <Button
+                size="lg"
+                className="h-12 w-full bg-gray-100 px-6 text-gray-500 hover:bg-gray-100 sm:w-auto"
+                disabled
+              >
                 Admins cannot place orders
               </Button>
             ) : role === "vendor" ? (
               /* Vendor → cannot order (own item or otherwise) */
-              <Button size="lg" className="w-full sm:w-auto" disabled>
+              <Button
+                size="lg"
+                className="h-12 w-full bg-gray-100 px-6 text-gray-500 hover:bg-gray-100 sm:w-auto"
+                disabled
+              >
                 {isOwnItem
                   ? "You cannot order your own item"
                   : "Vendors cannot place orders"}
               </Button>
             ) : !isAvailable ? (
               /* Customer but item not approved/active */
-              <Button size="lg" className="w-full sm:w-auto" disabled>
+              <Button
+                size="lg"
+                className="h-12 w-full bg-gray-100 px-6 text-gray-500 hover:bg-gray-100 sm:w-auto"
+                disabled
+              >
                 Ordering unavailable
               </Button>
             ) : (
-              /* Eligible customer */
-              <div className="flex items-center gap-3 w-full sm:w-auto">
-                <div className="flex items-center gap-1 border border-gray-200 rounded-lg bg-white px-2 py-1.5">
+              /* Eligible customer — quantity + Order Now */
+              <div className="flex w-full items-center gap-3 sm:w-auto">
+                <div className="flex h-12 items-center gap-1 rounded-lg border border-orange-200 bg-white px-2">
                   <button
                     type="button"
                     onClick={decrementQty}
                     disabled={quantity === 1}
-                    className="p-1 hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none"
+                    className="flex h-8 w-8 items-center justify-center rounded-md text-gray-500 transition hover:bg-orange-50 disabled:opacity-40 disabled:pointer-events-none"
                     aria-label="Decrease quantity"
                   >
-                    <span className="h-3.5 w-3.5 text-gray-500">−</span>
+                    <span className="text-base leading-none">−</span>
                   </button>
-                  <span className="text-sm font-medium w-8 text-center">
+                  <span className="w-8 text-center text-sm font-semibold">
                     {quantity}
                   </span>
                   <button
                     type="button"
                     onClick={incrementQty}
-                    className="p-1 hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none"
+                    className="flex h-8 w-8 items-center justify-center rounded-md text-gray-500 transition hover:bg-orange-50"
                     aria-label="Increase quantity"
                   >
-                    <span className="h-3.5 w-3.5 text-gray-500">+</span>
+                    <span className="text-base leading-none">+</span>
                   </button>
                 </div>
+
                 <Button
                   size="lg"
-                  className="flex-1 bg-red-600 text-white hover:bg-red-700"
+                  className="h-12 flex-1 bg-orange-500 px-8 text-sm font-semibold uppercase tracking-wide text-white hover:bg-orange-600 sm:flex-none"
                   disabled={ordering}
                   onClick={openOrderForm}
                 >
@@ -585,10 +611,7 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
                       Placing Order...
                     </>
                   ) : (
-                    <>
-                      <ShoppingCart className="mr-2 h-4 w-4" />
-                      Add to Order
-                    </>
+                    "Order Now"
                   )}
                 </Button>
               </div>
@@ -597,74 +620,65 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
 
           {/* Why ordering is (or is not) available */}
           {!isLoggedIn ? (
-            <p className="text-center text-xs text-muted-foreground">
+            <p className="text-xs text-gray-500">
               Sign in with a customer account to order this item.
             </p>
           ) : role === "admin" ? (
-            <p className="text-center text-xs text-muted-foreground">
+            <p className="text-xs text-gray-500">
               Admin accounts cannot place customer orders.
             </p>
           ) : role === "vendor" ? (
-            <p className="text-center text-xs text-muted-foreground">
+            <p className="text-xs text-gray-500">
               {isOwnItem
                 ? "This is your own menu item — vendors cannot order from themselves."
                 : "Vendor accounts cannot place customer orders."}
             </p>
           ) : !isAvailable ? (
-            <p className="text-center text-xs text-muted-foreground">
-              {unavailableReason}
-            </p>
+            <p className="text-xs text-gray-500">{unavailableReason}</p>
           ) : (
-            <p className="text-center text-xs text-muted-foreground">
+            <p className="text-xs text-gray-500">
               Your order is sent to the vendor for approval.
             </p>
           )}
 
-          <div className="flex items-baseline gap-1 mt-2">
-            <span className="text-sm font-medium text-muted-foreground">
-              Total:
-            </span>
-            <span className="text-lg font-bold text-red-600">
-              ৳{totalPrice}
-            </span>
-          </div>
+          {/* Category / Tags / Location — reference-style rows */}
+          <div className="border-t border-gray-100 pt-5 text-sm">
+            <p>
+              <span className="font-semibold text-gray-900">
+                Category:
+              </span>{" "}
+              <span className="text-gray-600">{menuItem.category}</span>
+            </p>
 
-          {/* Category & Tags */}
-          <div className="grid gap-4 pt-4 border-t border-red-50">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
-                Category
-              </span>
-              <span className="text-sm text-gray-900">{menuItem.category}</span>
-            </div>
+            {tags.length > 0 ? (
+              <p className="mt-3 border-t border-gray-100 pt-3">
+                <span className="font-semibold text-gray-900">
+                  Tags:
+                </span>{" "}
+                {tags.map((tag, index) => (
+                  <span key={tag}>
+                    {index > 0 ? ", " : ""}
+                    <span className="text-gray-600 transition hover:text-orange-500">
+                      {tag}
+                    </span>
+                  </span>
+                ))}
+              </p>
+            ) : null}
 
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
-                Tags
+            <p className="mt-3 flex flex-wrap items-center gap-1.5 border-t border-gray-100 pt-3">
+              <span className="font-semibold text-gray-900">
+                Location:
               </span>
-              <div className="flex flex-wrap gap-2">
-                {menuItem.category ? (
-                  <Badge variant="outline" className="border-orange-200 bg-orange-50 text-orange-700">
-                    {menuItem.category}
-                  </Badge>
-                ) : null}
-                {menuItem.location ? (
-                  <Badge variant="outline" className="border-gray-200 bg-gray-50 text-gray-700">
-                    {menuItem.location}
-                  </Badge>
-                ) : null}
-                <Badge variant="outline" className="border-gray-200 bg-gray-50 text-gray-700">
-                  Pizza
-                </Badge>
-                <Badge variant="outline" className="border-orange-200 bg-orange-50 text-orange-700">
-                  Spicy
-                </Badge>
-              </div>
-            </div>
+              <span className="flex items-center gap-1 text-gray-600">
+                <MapPin className="h-3.5 w-3.5 text-orange-500" />
+                {menuItem.location}
+              </span>
+            </p>
           </div>
 
           {/* Vendor Information */}
-          <div className="rounded-xl border border-orange-100 bg-orange-50/40 p-4">
+          <div className="rounded-lg border border-orange-100 bg-orange-50/50 p-4">
             <h2 className="text-xs font-semibold uppercase tracking-wide text-orange-600">
               Provided by
             </h2>
@@ -676,10 +690,10 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
                   alt={menuItem.vendorName || "Vendor"}
                   width={44}
                   height={44}
-                  className="h-11 w-11 rounded-full object-cover ring-2 ring-red-100"
+                  className="h-11 w-11 rounded-full object-cover ring-2 ring-orange-100"
                 />
               ) : (
-                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-red-50 text-red-600">
+                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-orange-100 text-orange-600">
                   <Store className="h-5 w-5" />
                 </div>
               )}
@@ -704,15 +718,16 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
       {/* ----------------------------------------------------------- */}
       {/* Tabs: Description / Reviews                                 */}
       {/* ----------------------------------------------------------- */}
-      <div className="mt-10">
-        <div className="flex gap-1 border-b border-red-50/30 pb-2">
+      <div className="mt-12">
+        {/* Tab headers — reference-style boxes sitting on the divider line */}
+        <div className="flex items-end gap-2">
           <button
             type="button"
             onClick={() => setActiveTab("description")}
-            className={`-mb-px border-b-2 px-4 py-2 text-sm font-medium transition ${
+            className={`rounded-t-md border px-6 py-2.5 text-sm font-semibold transition ${
               activeTab === "description"
-                ? "border-red-600 text-red-600"
-                : "border-transparent text-gray-500 hover:text-gray-900"
+                ? "border-orange-300 bg-white text-orange-500"
+                : "border-gray-200 bg-gray-50 text-gray-600 hover:text-orange-500"
             }`}
           >
             Description
@@ -720,50 +735,67 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
           <button
             type="button"
             onClick={() => setActiveTab("reviews")}
-            className={`-mb-px border-b-2 px-4 py-2 text-sm font-medium transition ${
+            className={`rounded-t-md border px-6 py-2.5 text-sm font-semibold transition ${
               activeTab === "reviews"
-                ? "border-red-600 text-red-600"
-                : "border-transparent text-gray-500 hover:text-gray-900"
+                ? "border-orange-300 bg-white text-orange-500"
+                : "border-gray-200 bg-gray-50 text-gray-600 hover:text-orange-500"
             }`}
           >
             Reviews ({reviewCount})
           </button>
+          <div className="flex-1 border-b border-gray-200" />
         </div>
 
         {/* Description panel */}
         {activeTab === "description" && (
-          <div className="mt-6 space-y-6">
-            <div>
-              <h2 className="text-lg font-bold">Description</h2>
-              <p className="mt-2 text-muted-foreground leading-relaxed">
-                {menuItem.description ||
-                  "No description available for this item."}
-              </p>
-            </div>
+          <div className="mt-6">
+            <h2 className="text-xl font-bold">Description</h2>
 
-            {/* Quick specs */}
-            <div className="grid gap-3 sm:grid-cols-3 border border-red-50/20 rounded-xl bg-white p-4 shadow-sm">
-              <div className="flex flex-col gap-1">
-                <span className="text-xs uppercase tracking-wider text-gray-500">
-                  Size (Weight)
-                </span>
-                <span className="text-sm text-gray-900">12" (420g)</span>
+            <p className="mt-4 text-sm leading-relaxed text-gray-500 sm:text-base">
+              {menuItem.description ||
+                "No description available for this item."}
+            </p>
+
+            {/* Quick specs — real item data */}
+            <dl className="mt-6 border-t border-gray-100">
+              <div className="flex gap-6 border-b border-gray-100 py-3 text-sm">
+                <dt className="w-40 shrink-0 font-medium text-gray-700">
+                  Category:
+                </dt>
+                <dd className="text-gray-500">{menuItem.category}</dd>
               </div>
-              <div className="flex flex-col gap-1">
-                <span className="text-xs uppercase tracking-wider text-gray-500">
-                  Dough
-                </span>
-                <span className="text-sm text-gray-900">
-                  {menuItem.location || "Deep Dish"}
-                </span>
+
+              <div className="flex gap-6 border-b border-gray-100 py-3 text-sm">
+                <dt className="w-40 shrink-0 font-medium text-gray-700">
+                  Location:
+                </dt>
+                <dd className="text-gray-500">{menuItem.location}</dd>
               </div>
-              <div className="flex flex-col gap-1">
-                <span className="text-xs uppercase tracking-wider text-gray-500">
-                  Spicy
-                </span>
-                <span className="text-sm text-gray-900">🌶️</span>
+
+              <div className="flex gap-6 border-b border-gray-100 py-3 text-sm">
+                <dt className="w-40 shrink-0 font-medium text-gray-700">
+                  Vendor:
+                </dt>
+                <dd className="text-gray-500">
+                  {menuItem.vendorName || "Unknown Vendor"}
+                </dd>
               </div>
-            </div>
+
+              <div className="flex gap-6 border-b border-gray-100 py-3 text-sm">
+                <dt className="w-40 shrink-0 font-medium text-gray-700">
+                  Availability:
+                </dt>
+                <dd className="text-gray-500">
+                  {isAvailable
+                    ? "Approved & Active"
+                    : menuItem.status === "Pending"
+                      ? "Pending approval"
+                      : menuItem.status === "Rejected"
+                        ? "Rejected"
+                        : "Inactive"}
+                </dd>
+              </div>
+            </dl>
           </div>
         )}
 
@@ -794,9 +826,10 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
             <div className="flex items-center justify-between gap-3 rounded-lg border bg-muted/30 px-3 py-2 text-sm">
               <span className="truncate font-medium">
                 {menuItem?.itemName}
+                {quantity > 1 ? ` × ${quantity}` : ""}
               </span>
-              <span className="shrink-0 font-bold text-red-600">
-                ৳{menuItem?.price}
+              <span className="shrink-0 font-bold text-orange-500">
+                ৳{totalPrice}
               </span>
             </div>
 
@@ -858,7 +891,7 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
             </Button>
 
             <Button
-              className="bg-red-600 text-white hover:bg-red-700"
+              className="bg-orange-500 text-white hover:bg-orange-600"
               onClick={handleOrder}
               disabled={ordering}
             >

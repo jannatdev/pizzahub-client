@@ -5,39 +5,29 @@ import { authFetch } from "./auth-fetch";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-// Shared request helper (mirrors `lib/api/menu.ts`): builds the URL, explains
-// network failures (backend not running) and always parses JSON safely.
+// Shared request helper for endpoints that need the customer's JWT.
 const request = async (path: string, init?: RequestInit) => {
   if (!API_URL) {
     throw new Error("NEXT_PUBLIC_API_URL is not configured.");
   }
 
-  const url = `${API_URL}${path}`;
-
-  let response: Response;
-
+  // `authFetch` already prefixes NEXT_PUBLIC_API_URL and attaches the Bearer
+  // token, so only the RELATIVE path may be passed here. Passing a full URL
+  // used to produce `…/https://…/api/orders`, which 404'd and made every
+  // single order fail with "Could not reach the API".
   try {
-    response = await  authFetch(url, init);
-  } catch {
-    throw new Error(
-      "Could not reach the API. Please make sure the backend server is running."
-    );
+    return await authFetch(path, init);
+  } catch (err) {
+    // fetch() rejects with TypeError only when the request never left the
+    // machine (backend down / offline). API errors (401, 403, 400…) already
+    // carry the server's message and status — surface those unchanged.
+    if (err instanceof TypeError) {
+      throw new Error(
+        "Could not reach the API. Please make sure the backend server is running."
+      );
+    }
+    throw err;
   }
-
-  const data: ApiResponse<unknown> | null = await response
-    .json()
-    .catch(() => null);
-
-  if (!response.ok || !data?.success) {
-    const error = new Error(
-      data?.message || `Request failed (HTTP ${response.status}).`
-    ) as Error & { status?: number };
-
-    error.status = response.status;
-    throw error;
-  }
-
-  return data;
 };
 
 // GET MY ORDERS — GET /api/orders (backend returns the signed-in customer's
