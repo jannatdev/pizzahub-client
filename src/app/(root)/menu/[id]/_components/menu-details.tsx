@@ -511,7 +511,7 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
           </div>
 
           {/* Thumbnails */}
-          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+          {/* <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
             {galleryImages.map((src, index) => (
               <button
                 key={index}
@@ -531,7 +531,7 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
                 />
               </button>
             ))}
-          </div>
+          </div> */}
 
           {/* Other items in the same category — small image row */}
           {relatedForCategory.length > 0 ? (
