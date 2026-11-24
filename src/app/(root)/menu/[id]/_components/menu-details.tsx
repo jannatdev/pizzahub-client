@@ -504,6 +504,12 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
             </span>
           </div>
 
+          {/* Location */}
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <MapPin className="h-4 w-4 text-orange-500" />
+            <span>{menuItem.location}</span>
+          </div>
+
           {/* Order actions */}
           <div className="flex flex-col sm:flex-row items-end gap-4">
             {/* Session still loading — avoid flashing the wrong button */}
@@ -653,6 +659,42 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
                 <Badge variant="outline" className="border-orange-200 bg-orange-50 text-orange-700">
                   Spicy
                 </Badge>
+              </div>
+            </div>
+          </div>
+
+          {/* Vendor Information */}
+          <div className="rounded-xl border border-orange-100 bg-orange-50/40 p-4">
+            <h2 className="text-xs font-semibold uppercase tracking-wide text-orange-600">
+              Provided by
+            </h2>
+
+            <div className="mt-3 flex items-center gap-3">
+              {menuItem.vendorImage ? (
+                <Image
+                  src={menuItem.vendorImage}
+                  alt={menuItem.vendorName || "Vendor"}
+                  width={44}
+                  height={44}
+                  className="h-11 w-11 rounded-full object-cover ring-2 ring-red-100"
+                />
+              ) : (
+                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-red-50 text-red-600">
+                  <Store className="h-5 w-5" />
+                </div>
+              )}
+
+              <div className="min-w-0">
+                <p className="truncate font-semibold">
+                  {menuItem.vendorName || "Unknown Vendor"}
+                </p>
+
+                {menuItem.vendorEmail ? (
+                  <p className="flex items-center gap-1.5 truncate text-sm text-muted-foreground">
+                    <Mail className="h-3.5 w-3.5 shrink-0" />
+                    {menuItem.vendorEmail}
+                  </p>
+                ) : null}
               </div>
             </div>
           </div>
