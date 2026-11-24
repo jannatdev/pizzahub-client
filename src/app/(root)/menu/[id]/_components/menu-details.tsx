@@ -574,7 +574,7 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
                 Ordering unavailable
               </Button>
             ) : (
-              /* Eligible customer — quantity + Order Now */
+              /* Eligible customer — quantity + Order now */
               <div className="flex w-full items-center gap-3 sm:w-auto">
                 <div className="flex h-12 items-center gap-1 rounded-lg border border-orange-200 bg-white px-2">
                   <button
@@ -601,7 +601,7 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
 
                 <Button
                   size="lg"
-                  className="h-12 flex-1 bg-orange-500 px-8 text-sm font-semibold uppercase tracking-wide text-white hover:bg-orange-600 sm:flex-none"
+                  className="h-12 flex-1 bg-orange-500 px-8 text-sm font-semibold text-white hover:bg-orange-600 sm:flex-none"
                   disabled={ordering}
                   onClick={openOrderForm}
                 >
@@ -611,7 +611,7 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
                       Placing Order...
                     </>
                   ) : (
-                    "Order Now"
+                    "Order now"
                   )}
                 </Button>
               </div>
