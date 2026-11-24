@@ -50,7 +50,6 @@ import { signOut, useSession } from "@/lib/auth-client";
 import { DASHBOARD_HOME, PROFILE_HOME } from "@/lib/dashboard-paths";
 import { toast } from "sonner";
 
-import ProfileInfoDialog from "../profile-update-dialogue";
 
 type SessionUser = {
   name: string;
@@ -377,16 +376,8 @@ const handleProfile = () => {
         </div>
       </div>
 
-      {/* Profile Dialog */}
-      {user && (
-        <ProfileInfoDialog
-          open={profileOpen}
-          onOpenChange={setProfileOpen}
-          name={user.name}
-          email={user.email}
-          image={user.image}
-        />
-      )}
+    
+     
     </>
   );
 }

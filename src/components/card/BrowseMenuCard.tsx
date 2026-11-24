@@ -10,22 +10,15 @@ import type { Menu } from "@/type/menu";
 
 interface MenuCardProps {
   menu: Menu;
-  isLoggedIn: boolean;
 }
 
 export const BrowseMenuCard = ({
   menu,
-  isLoggedIn,
 }: MenuCardProps) => {
   const router = useRouter();
 
   const handleViewDetails = () => {
-    // Browsing is public, but viewing details requires an account.
-    if (!isLoggedIn) {
-      router.push("/sign-in");
-      return;
-    }
-
+    // Viewing menu details is public — no login required.
     router.push(`/menu/${menu._id}`);
   };
 

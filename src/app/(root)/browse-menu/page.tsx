@@ -16,7 +16,6 @@ import type { Menu } from "@/type/menu";
 
 import MenuPageloading from "../loading";
 import { getAllPublicMenus } from "@/lib/api/browseMenu";
-import { useSession } from "@/lib/auth-client";
 
 import BrowseMenuCard from "@/components/card/BrowseMenuCard";
 
@@ -34,9 +33,6 @@ const distinctValues = (items: Menu[], key: "category" | "location") =>
 const BrowseMenuPage = () => {
   // Browsing is public — no login required. Only View Details needs an
   // account, so the session decides where the button navigates.
-  const { data: session } = useSession();
-  const isLoggedIn = Boolean(session?.user);
-
   const [menus, setMenus] = useState<Menu[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [locations, setLocations] = useState<string[]>([]);
@@ -104,7 +100,7 @@ const BrowseMenuPage = () => {
   }, [search, category, location, sort]);
 
   return (
-    <section className="space-y-8 max-w-7xl mx-auto mb-20">
+    <section className="space-y-8 max-w-7xl mx-auto m-y-20">
       {/* Page Heading */}
       <div className="space-y-3 text-center">
         <span className="inline-block rounded-full bg-orange-500/15 px-4 py-1.5 text-sm font-semibold text-red-600 ring-1 ring-orange-500/30">
@@ -233,7 +229,6 @@ const BrowseMenuPage = () => {
             <BrowseMenuCard
               key={menu._id}
               menu={menu}
-              isLoggedIn={isLoggedIn}
             />
           ))
         ) : (

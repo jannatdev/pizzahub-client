@@ -73,6 +73,7 @@ export default function OrderCard({
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [cancelOpen, setCancelOpen] = useState(false);
   const [cancelling, setCancelling] = useState(false);
+  
 
   const handleCancelOrder = async () => {
     try {
@@ -110,6 +111,7 @@ export default function OrderCard({
                   fill
                   sizes="(max-width: 640px) 100vw, 144px"
                   className="object-cover"
+                  unoptimized
                 />
               ) : (
                 <div className="flex h-full items-center justify-center">

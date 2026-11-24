@@ -17,10 +17,6 @@ import { ArrowRight, UtensilsCrossed } from "lucide-react";
 import { getAllPublicMenus } from "@/lib/api/browseMenu";
 import Link from "next/link";
 
-interface FeaturedMenuSectionProps {
-  isLoggedIn: boolean;
-}
-
 const containerVariants = {
   hidden: {},
   visible: {
@@ -45,9 +41,7 @@ const cardVariants = {
   },
 };
 
-const FeaturedMenuSection = ({
-  isLoggedIn,
-}: FeaturedMenuSectionProps) => {
+const FeaturedMenuSection = () => {
   const [items, setItems] = useState<Menu[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("All");
@@ -184,7 +178,6 @@ const FeaturedMenuSection = ({
                 >
                   <BrowseMenuCard
                     menu={menu}
-                    isLoggedIn={isLoggedIn}
                   />
                 </motion.div>
               ))}

@@ -16,6 +16,7 @@ import {
   ShoppingCart,
   Store,
   UtensilsCrossed,
+  Star,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -89,6 +90,11 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
 
   // Image gallery index
   const [activeIndex, setActiveIndex] = useState(0);
+
+  // Active tab: "description" | "reviews"
+  const [activeTab, setActiveTab] = useState<"description" | "reviews">(
+    "description"
+  );
 
   // ---------------------------------------------------------------
   // Fetch item details (public endpoint — viewing needs no login)
@@ -180,6 +186,10 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
           ? "This item is currently unavailable."
           : "Ordering unavailable for this item.";
 
+  // Rating stars (visual only — backend does not expose a rating yet)
+  const starCount = 4;
+  const reviewCount = 2;
+
   // ---------------------------------------------------------------
   // Place order — step 1 opens the delivery form, step 2 submits
   // (backend re-validates everything)
@@ -227,6 +237,13 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
       setOrdering(false);
     }
   };
+
+  // ---------------------------------------------------------------
+  // Quantity helper
+  // ---------------------------------------------------------------
+  const [quantity, setQuantity] = useState(1);
+  const incrementQty = () => setQuantity((q) => q + 1);
+  const decrementQty = () => setQuantity((q) => Math.max(1, q - 1));
 
   // ---------------------------------------------------------------
   // Loading skeleton
@@ -316,7 +333,7 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
   }
 
   // ---------------------------------------------------------------
-  // Ready — item details
+  // Ready — product details
   // ---------------------------------------------------------------
   // Status badge (mirrors the admin/vendor card styles)
   const statusBadge =
@@ -336,85 +353,120 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
       </Badge>
     );
 
+  const stars = Array.from({ length: starCount }).map((_, i) => (
+    <Star
+      key={i}
+      className="h-4 w-4 fill-yellow-400 text-yellow-400"
+    />
+  ));
+
+  const totalPrice = menuItem.price * quantity;
+
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-      {/* Back link */}
-      <Link
-        href="/browse-menu"
-        className="inline-flex items-center gap-2 text-sm font-medium text-red-600 transition-colors hover:text-red-700"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Back to Browse Menu
-      </Link>
+      {/* Breadcrumb */}
+      <nav className="flex items-center gap-1 text-sm text-muted-foreground mb-6">
+        <Link
+          href="/"
+          className="text-red-600 hover:text-red-700 hover:underline"
+        >
+          Home
+        </Link>
+        <span className="text-gray-400">›</span>
+        <Link
+          href="/browse-menu"
+          className="text-red-600 hover:text-red-700 hover:underline"
+        >
+          {menuItem.category}
+        </Link>
+        <span className="text-gray-400">›</span>
+        <span className="text-gray-900 font-medium">
+          {menuItem.itemName}
+        </span>
+      </nav>
 
-      <div className="mt-6 grid gap-8 lg:grid-cols-2">
+      <div className="grid gap-8 lg:grid-cols-2 gap-y-6">
         {/* ------------------------------------------------------- */}
-        {/* Image gallery                                            */}
+        {/* Image gallery                                             */}
         {/* ------------------------------------------------------- */}
-        <div>
-          {galleryImages.length > 0 ? (
-            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl border border-red-100 bg-red-50">
-              <Image
-                src={galleryImages[activeIndex]}
-                alt={`${menuItem.itemName} — image ${activeIndex + 1} of ${galleryImages.length}`}
-                fill
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                className="object-cover"
-                priority
-              />
+        <div className="space-y-4">
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl border border-red-100 bg-red-50">
+            <Image
+              src={galleryImages[activeIndex]}
+              alt={`${menuItem.itemName} — image ${activeIndex + 1} of ${galleryImages.length}`}
+              fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="object-cover"
+              priority
+            />
 
-              {/* Previous / next (only when there is more than one image) */}
-              {galleryImages.length > 1 && (
-                <>
-                  <button
-                    type="button"
-                    aria-label="Previous image"
-                    onClick={showPrevImage}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2 text-red-600 shadow-sm transition hover:bg-white"
-                  >
-                    <ChevronLeft className="h-5 w-5" />
-                  </button>
+            {/* Previous / next (only when there is more than one image) */}
+            {galleryImages.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  aria-label="Previous image"
+                  onClick={showPrevImage}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2 text-red-600 shadow-sm transition hover:bg-white"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </button>
 
-                  <button
-                    type="button"
-                    aria-label="Next image"
-                    onClick={showNextImage}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2 text-red-600 shadow-sm transition hover:bg-white"
-                  >
-                    <ChevronRight className="h-5 w-5" />
-                  </button>
+                <button
+                  type="button"
+                  aria-label="Next image"
+                  onClick={showNextImage}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2 text-red-600 shadow-sm transition hover:bg-white"
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </button>
 
-                  {/* Dot indicators */}
-                  <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
-                    {galleryImages.map((_, index) => (
-                      <button
-                        key={index}
-                        type="button"
-                        aria-label={`View image ${index + 1}`}
-                        onClick={() => setActiveIndex(index)}
-                        className={`h-2 w-2 rounded-full transition ${
-                          index === activeIndex
-                            ? "bg-red-600"
-                            : "bg-white/80"
-                        }`}
-                      />
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
-          ) : (
-            <div className="flex aspect-[4/3] w-full flex-col items-center justify-center gap-2 rounded-xl border border-red-100 bg-red-50 text-red-300">
-              <Store className="h-12 w-12" />
-              <span className="text-sm font-medium">
-                No image available
-              </span>
-            </div>
-          )}
+                {/* Dot indicators */}
+                <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
+                  {galleryImages.map((_, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      aria-label={`View image ${index + 1}`}
+                      onClick={() => setActiveIndex(index)}
+                      className={`h-2 w-2 rounded-full transition ${
+                        index === activeIndex
+                          ? "bg-red-600"
+                          : "bg-white/80"
+                      }`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Thumbnails */}
+          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+            {galleryImages.map((src, index) => (
+              <button
+                key={index}
+                type="button"
+                onClick={() => setActiveIndex(index)}
+                className={`shrink-0 w-24 h-24 rounded-lg border overflow-hidden ${
+                  activeIndex === index
+                    ? "border-red-600 ring-2 ring-red-600"
+                    : "border-red-100 hover:border-red-200 transition"
+                }`}
+              >
+                <Image
+                  src={src}
+                  alt={`Thumbnail ${index + 1}`}
+                  fill
+                  className="object-cover"
+                />
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* ------------------------------------------------------- */}
-        {/* Item information                                         */}
+        {/* Item information                                          */}
         {/* ------------------------------------------------------- */}
         <div className="space-y-5">
           {/* Category + status */}
@@ -426,88 +478,39 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
           </div>
 
           {/* Name */}
-          <h1 className="text-3xl font-bold sm:text-4xl">
+          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
             {menuItem.itemName}
           </h1>
 
-          {/* Price + location */}
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
-            <p className="text-3xl font-extrabold text-red-600">
-              ৳{menuItem.price}
-            </p>
-
-            <p className="flex items-center gap-2 text-sm text-muted-foreground">
-              <MapPin className="h-4 w-4 text-orange-500" />
-              {menuItem.location}
-            </p>
+          {/* Rating */}
+          <div className="flex items-center gap-2">
+            {stars}
+            <span className="text-sm text-muted-foreground">
+              ({reviewCount} customer reviews)
+            </span>
           </div>
 
-          {/* Description */}
+          {/* Short description */}
           {menuItem.description ? (
-            <div className="space-y-1">
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-orange-600">
-                Description
-              </h2>
-              <p className="leading-relaxed text-muted-foreground">
-                {menuItem.description}
-              </p>
-            </div>
+            <p className="text-muted-foreground leading-relaxed">
+              {menuItem.description}
+            </p>
           ) : null}
 
-          {/* Vendor information */}
-          <div className="rounded-xl border border-orange-100 bg-orange-50/40 p-4">
-            <h2 className="text-xs font-semibold uppercase tracking-wide text-orange-600">
-              Provided by
-            </h2>
-
-            <div className="mt-3 flex items-center gap-3">
-              {menuItem.vendorImage ? (
-                <Image
-                  src={menuItem.vendorImage}
-                  alt={menuItem.vendorName || "Vendor"}
-                  width={44}
-                  height={44}
-                  className="h-11 w-11 rounded-full object-cover ring-2 ring-red-100"
-                />
-              ) : (
-                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-red-50 text-red-600">
-                  <Store className="h-5 w-5" />
-                </div>
-              )}
-
-              <div className="min-w-0">
-                <p className="truncate font-semibold">
-                  {menuItem.vendorName || "Unknown Vendor"}
-                </p>
-
-                {menuItem.vendorEmail ? (
-                  <p className="flex items-center gap-1.5 truncate text-sm text-muted-foreground">
-                    <Mail className="h-3.5 w-3.5 shrink-0" />
-                    {menuItem.vendorEmail}
-                  </p>
-                ) : null}
-              </div>
-            </div>
+          {/* Price */}
+          <div className="flex items-baseline gap-3">
+            <span className="text-4xl font-extrabold text-red-600">
+              ৳{menuItem.price}
+            </span>
           </div>
 
-          {/* ----------------------------------------------------- */}
-          {/* Order box                                              */}
-          {/* ----------------------------------------------------- */}
-          <div className="space-y-3 rounded-xl border border-red-100 bg-white p-5 shadow-sm">
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-sm font-medium text-muted-foreground">
-                Price
-              </span>
-              <span className="text-xl font-bold text-red-600">
-                ৳{menuItem.price}
-              </span>
-            </div>
-
+          {/* Order actions */}
+          <div className="flex flex-col sm:flex-row items-end gap-4">
             {/* Session still loading — avoid flashing the wrong button */}
             {isPending ? (
               <Button
                 size="lg"
-                className="w-full"
+                className="w-full sm:w-auto"
                 disabled
               >
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -518,65 +521,218 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
               <Button
                 size="lg"
                 render={<Link href="/sign-in" />}
-                className="w-full bg-red-600 text-white hover:bg-red-700"
+                className="w-full sm:w-auto bg-red-600 text-white hover:bg-red-700"
               >
                 Login to Order
               </Button>
             ) : role === "admin" ? (
               /* Admin → cannot place customer orders */
-              <Button size="lg" className="w-full" disabled>
+              <Button size="lg" className="w-full sm:w-auto" disabled>
                 Admins cannot place orders
               </Button>
             ) : role === "vendor" ? (
               /* Vendor → cannot order (own item or otherwise) */
-              <Button size="lg" className="w-full" disabled>
+              <Button size="lg" className="w-full sm:w-auto" disabled>
                 {isOwnItem
                   ? "You cannot order your own item"
                   : "Vendors cannot place orders"}
               </Button>
             ) : !isAvailable ? (
               /* Customer but item not approved/active */
-              <Button size="lg" className="w-full" disabled>
+              <Button size="lg" className="w-full sm:w-auto" disabled>
                 Ordering unavailable
               </Button>
             ) : (
               /* Eligible customer */
-              <Button
-                size="lg"
-                className="w-full bg-red-600 text-white hover:bg-red-700"
-                disabled={ordering}
-                onClick={openOrderForm}
-              >
-                {ordering ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Placing Order...
-                  </>
-                ) : (
-                  <>
-                    <ShoppingCart className="mr-2 h-4 w-4" />
-                    Order Now
-                  </>
-                )}
-              </Button>
+              <div className="flex items-center gap-3 w-full sm:w-auto">
+                <div className="flex items-center gap-1 border border-gray-200 rounded-lg bg-white px-2 py-1.5">
+                  <button
+                    type="button"
+                    onClick={decrementQty}
+                    disabled={quantity === 1}
+                    className="p-1 hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none"
+                    aria-label="Decrease quantity"
+                  >
+                    <span className="h-3.5 w-3.5 text-gray-500">−</span>
+                  </button>
+                  <span className="text-sm font-medium w-8 text-center">
+                    {quantity}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={incrementQty}
+                    className="p-1 hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none"
+                    aria-label="Increase quantity"
+                  >
+                    <span className="h-3.5 w-3.5 text-gray-500">+</span>
+                  </button>
+                </div>
+                <Button
+                  size="lg"
+                  className="flex-1 bg-red-600 text-white hover:bg-red-700"
+                  disabled={ordering}
+                  onClick={openOrderForm}
+                >
+                  {ordering ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Placing Order...
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingCart className="mr-2 h-4 w-4" />
+                      Add to Order
+                    </>
+                  )}
+                </Button>
+              </div>
             )}
+          </div>
 
-            {/* Why ordering is (or is not) available */}
+          {/* Why ordering is (or is not) available */}
+          {!isLoggedIn ? (
             <p className="text-center text-xs text-muted-foreground">
-              {!isLoggedIn
-                ? "Sign in with a customer account to order this item."
-                : role === "admin"
-                  ? "Admin accounts cannot place customer orders."
-                  : role === "vendor"
-                    ? isOwnItem
-                      ? "This is your own menu item — vendors cannot order from themselves."
-                      : "Vendor accounts cannot place customer orders."
-                    : !isAvailable
-                      ? unavailableReason
-                      : "Your order is sent to the vendor for approval."}
+              Sign in with a customer account to order this item.
             </p>
+          ) : role === "admin" ? (
+            <p className="text-center text-xs text-muted-foreground">
+              Admin accounts cannot place customer orders.
+            </p>
+          ) : role === "vendor" ? (
+            <p className="text-center text-xs text-muted-foreground">
+              {isOwnItem
+                ? "This is your own menu item — vendors cannot order from themselves."
+                : "Vendor accounts cannot place customer orders."}
+            </p>
+          ) : !isAvailable ? (
+            <p className="text-center text-xs text-muted-foreground">
+              {unavailableReason}
+            </p>
+          ) : (
+            <p className="text-center text-xs text-muted-foreground">
+              Your order is sent to the vendor for approval.
+            </p>
+          )}
+
+          <div className="flex items-baseline gap-1 mt-2">
+            <span className="text-sm font-medium text-muted-foreground">
+              Total:
+            </span>
+            <span className="text-lg font-bold text-red-600">
+              ৳{totalPrice}
+            </span>
+          </div>
+
+          {/* Category & Tags */}
+          <div className="grid gap-4 pt-4 border-t border-red-50">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+                Category
+              </span>
+              <span className="text-sm text-gray-900">{menuItem.category}</span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+                Tags
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {menuItem.category ? (
+                  <Badge variant="outline" className="border-orange-200 bg-orange-50 text-orange-700">
+                    {menuItem.category}
+                  </Badge>
+                ) : null}
+                {menuItem.location ? (
+                  <Badge variant="outline" className="border-gray-200 bg-gray-50 text-gray-700">
+                    {menuItem.location}
+                  </Badge>
+                ) : null}
+                <Badge variant="outline" className="border-gray-200 bg-gray-50 text-gray-700">
+                  Pizza
+                </Badge>
+                <Badge variant="outline" className="border-orange-200 bg-orange-50 text-orange-700">
+                  Spicy
+                </Badge>
+              </div>
+            </div>
           </div>
         </div>
+      </div>
+
+      {/* ----------------------------------------------------------- */}
+      {/* Tabs: Description / Reviews                                 */}
+      {/* ----------------------------------------------------------- */}
+      <div className="mt-10">
+        <div className="flex gap-1 border-b border-red-50/30 pb-2">
+          <button
+            type="button"
+            onClick={() => setActiveTab("description")}
+            className={`-mb-px border-b-2 px-4 py-2 text-sm font-medium transition ${
+              activeTab === "description"
+                ? "border-red-600 text-red-600"
+                : "border-transparent text-gray-500 hover:text-gray-900"
+            }`}
+          >
+            Description
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("reviews")}
+            className={`-mb-px border-b-2 px-4 py-2 text-sm font-medium transition ${
+              activeTab === "reviews"
+                ? "border-red-600 text-red-600"
+                : "border-transparent text-gray-500 hover:text-gray-900"
+            }`}
+          >
+            Reviews ({reviewCount})
+          </button>
+        </div>
+
+        {/* Description panel */}
+        {activeTab === "description" && (
+          <div className="mt-6 space-y-6">
+            <div>
+              <h2 className="text-lg font-bold">Description</h2>
+              <p className="mt-2 text-muted-foreground leading-relaxed">
+                {menuItem.description ||
+                  "No description available for this item."}
+              </p>
+            </div>
+
+            {/* Quick specs */}
+            <div className="grid gap-3 sm:grid-cols-3 border border-red-50/20 rounded-xl bg-white p-4 shadow-sm">
+              <div className="flex flex-col gap-1">
+                <span className="text-xs uppercase tracking-wider text-gray-500">
+                  Size (Weight)
+                </span>
+                <span className="text-sm text-gray-900">12" (420g)</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs uppercase tracking-wider text-gray-500">
+                  Dough
+                </span>
+                <span className="text-sm text-gray-900">
+                  {menuItem.location || "Deep Dish"}
+                </span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs uppercase tracking-wider text-gray-500">
+                  Spicy
+                </span>
+                <span className="text-sm text-gray-900">🌶️</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Reviews panel */}
+        {activeTab === "reviews" && (
+          <div className="mt-6 text-center py-12">
+            <p className="text-muted-foreground">
+              No reviews yet. Be the first to review this item.
+            </p>
+          </div>
+        )}
       </div>
 
       {/* ----------------------------------------------------------- */}
