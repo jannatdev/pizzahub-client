@@ -37,6 +37,7 @@ import {
 import type { Menu } from "@/type/menu";
 import type { UserRole } from "@/context/auth-context";
 import { getMenuDetails } from "@/lib/api/menu";
+import { getAllPublicMenus } from "@/lib/api/browseMenu";
 import { createOrder } from "@/lib/api/order";
 import { useSession } from "@/lib/auth-client";
 
@@ -76,6 +77,14 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
   const [menuItem, setMenuItem] = useState<Menu | null>(null);
   const [pageState, setPageState] = useState<PageState>("loading");
   const [errorMsg, setErrorMsg] = useState("");
+
+  // Other approved + active items of the same category (cross-links).
+  // Stored together with their category so stale data from a previously
+  // viewed item never renders under the wrong heading.
+  const [related, setRelated] = useState<{
+    category: string;
+    items: Menu[];
+  }>({ category: "", items: [] });
 
   // Order button state (prevents double-clicks / duplicate requests)
   const [ordering, setOrdering] = useState(false);
@@ -136,6 +145,40 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
       ignore = true;
     };
   }, [id]);
+
+  // ---------------------------------------------------------------
+  // Related items — other approved + active dishes in the same
+  // category. Best-effort: the section just stays hidden on failure.
+  // setState only runs inside the async callback (React lint rule).
+  // ---------------------------------------------------------------
+  useEffect(() => {
+    if (pageState !== "ready" || !menuItem?.category) return;
+
+    const category = menuItem.category;
+    const currentId = menuItem._id;
+    let ignore = false;
+
+    (async () => {
+      try {
+        const data = await getAllPublicMenus({ category });
+
+        if (ignore) return;
+
+        setRelated({
+          category,
+          items: (data.menus ?? [])
+            .filter((item) => item._id !== currentId)
+            .slice(0, 8),
+        });
+      } catch {
+        // Non-critical — leave the section hidden.
+      }
+    })();
+
+    return () => {
+      ignore = true;
+    };
+  }, [pageState, menuItem]);
 
   // ---------------------------------------------------------------
   // Gallery images (supports an image array, falls back to imageUrl)
@@ -374,6 +417,13 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
   // Real tag values available in the data model (no fake demo tags)
   const tags = [menuItem.category, menuItem.location].filter(Boolean);
 
+  // Same-category cross-links, only once they belong to THIS item's
+  // category and excluding the item itself.
+  const relatedForCategory =
+    related.category === menuItem.category
+      ? related.items.filter((item) => item._id !== menuItem._id)
+      : [];
+
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
       {/* Breadcrumb — Home » Category » Item */}
@@ -482,6 +532,51 @@ export const MenuDetails = ({ id }: MenuDetailsProps) => {
               </button>
             ))}
           </div>
+
+          {/* Other items in the same category — small image row */}
+          {relatedForCategory.length > 0 ? (
+            <div className="pt-2">
+              <h2 className="text-sm font-semibold text-gray-900">
+                More in{" "}
+                <span className="text-orange-500">
+                  {menuItem.category}
+                </span>
+              </h2>
+
+              <div className="mt-3 flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                {relatedForCategory.map((item) => (
+                  <Link
+                    key={item._id}
+                    href={`/menu/${item._id}`}
+                    className="group w-24 shrink-0"
+                  >
+                    <div className="relative h-24 w-24 overflow-hidden rounded-md border border-gray-200 bg-gray-100">
+                      {item.imageUrl ? (
+                        <Image
+                          src={item.imageUrl}
+                          alt={item.itemName}
+                          fill
+                          sizes="96px"
+                          className="object-cover transition group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center">
+                          <UtensilsCrossed className="h-6 w-6 text-orange-200" />
+                        </div>
+                      )}
+                    </div>
+
+                    <p className="mt-1.5 truncate text-xs font-medium text-gray-700 transition group-hover:text-orange-500">
+                      {item.itemName}
+                    </p>
+                    <p className="text-xs font-semibold text-orange-500">
+                      ৳{item.price}
+                    </p>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ) : null}
         </div>
 
         {/* ------------------------------------------------------- */}
