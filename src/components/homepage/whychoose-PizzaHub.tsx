@@ -136,7 +136,7 @@ const WhyChoosePizzaHub = () => {
           whileInView={{ opacity: 1, scale: 1, x: 0 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="relative mx-auto w-full max-w-[580px]"
+          className="relative mx-auto w-full max-w-[540px]"
         >
           {/* Decorative circle */}
           <div className="absolute left-1/2 top-1/2 h-[75%] w-[75%] -translate-x-1/2 -translate-y-1/2 " />
@@ -149,7 +149,7 @@ const WhyChoosePizzaHub = () => {
               repeat: Infinity,
               ease: "easeInOut",
             }}
-            className="absolute -left-1 top-12 z-20 flex items-center gap-3 rounded-2xl border border-orange-100 bg-white px-4 py-3 shadow-xl sm:-left-5"
+            className="absolute left-8 top-4 z-20 flex items-center gap-3 rounded-2xl border border-orange-100 bg-white px-4 py-3 shadow-xl sm:-left-5"
           >
             <div className="flex h-11 w-11 items-center justify-center rounded-full bg-orange-100 text-red-600">
               <Clock3 className="h-6 w-6" />
@@ -165,14 +165,14 @@ const WhyChoosePizzaHub = () => {
           </motion.div>
 
           {/* Main image */}
-          <div className="relative aspect-square w-full">
+          <div className="relative  aspect-square w-full h-full ">
             <Image
               src={DeliveryImg}
               alt="Delicious PizzaHub food delivery"
               fill
               priority={false}
-              sizes="(max-width: 768px) 100vw, 50vw"
-              className="z-10 object-contain drop-shadow-2xl rounded-2xl"
+              // sizes="(max-width: 768px) 80vw, 80vw"
+              className="z-10 h-60 w-full drop-shadow-2xl  rounded-2xl border-2 border-orange-300 p-4 shadow-[0_0_20px_rgba(249,115,22,0.25)]"
             />
           </div>
 
@@ -184,7 +184,7 @@ const WhyChoosePizzaHub = () => {
               repeat: Infinity,
               ease: "easeInOut",
             }}
-            className="absolute -bottom-2 right-0 z-20 flex items-center gap-2 rounded-2xl bg-white px-5 py-4 shadow-xl sm:-right-4"
+            className="absolute bottom-4 -right-2 z-20 flex items-center gap-2 rounded-2xl bg-white px-5 py-4 shadow-xl sm:-right-4"
           >
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-50 text-red-600">
               <Pizza className="h-6 w-6" />

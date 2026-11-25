@@ -63,13 +63,13 @@ const Footer = () => {
             <h3 className="mb-6 text-lg font-bold">
               Quick Links
             </h3>
-            <ul className="space-y-4 text-sm text-gray-400">
+            <ul className="space-y-4 mt-5 text-sm text-gray-400">
               {[
                 ["Home", "/"],
                 ["Browse Menus", "/browse-menu"],
-                ["About Us", "/about"],
+              
                 ["My Orders", "/my-orders"],
-                ["Contact Us", "/contact"],
+                ["Contact", "/contact"],
               ].map(([name, href]) => (
                 <li key={name}>
                   <Link

@@ -129,13 +129,14 @@ const ComboOfferSection = () => {
           <div className="mt-9">
             <Button
              
-              className="group h-12 rounded-full bg-white px-7 text-base font-bold text-red-700 shadow-xl transition-all duration-300 hover:-translate-y-1 hover:bg-yellow-300 hover:text-red-800"
+              className="  items-center h-12 rounded-full bg-white px-7 text-base font-bold text-red-700 shadow-xl transition-all duration-300 hover:-translate-y-1 hover:bg-yellow-300 hover:text-red-800"
             >
               <Link href="/browse-menu">
                 Order Combo Now
-
-                <ArrowRight className="ml-2 h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
+               
               </Link>
+              <span className=" mt-1.5 h-5 w-5 transition-transform duration-300 group-hover:translate-x-1"> 
+                <ArrowRight  /></span>
             </Button>
           </div>
         </motion.div>
